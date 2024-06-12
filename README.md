@@ -1,16 +1,5 @@
 # test2
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1 - Deben descargar onsets_frames_wavinput.tflite desde https://github.com/WonyJeong/flutter_piano_audio_detection
+2- Crear carpeta assets donde se indica en el repo punto 1
+3- cambiar la ruta "C:\Users\Carlos\StudioProjects\test2\android\app\src\main\assets\onsets_frames_wavinput.tflite" en pubspec.yaml a la de su computador.
