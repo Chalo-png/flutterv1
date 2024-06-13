@@ -1,11 +1,14 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import "dart:math";
 
 class GeneraMelodiaScreen extends StatefulWidget {
   @override
   _GeneraMelodiaScreenState createState() => _GeneraMelodiaScreenState();
 }
+var notes = ["C", "D", "E", "F", "G", "A", "B"];
+var duration = [1,2,4];
 
 class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
   String selectedDifficulty = "";
@@ -59,6 +62,26 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
             ElevatedButton(
               onPressed: () {
                 // Handle confirmation action
+                int octaveAmount = 4;
+                int octaveDuration = 4;
+                var data = <Map>[];
+                for (var i = 0; i < octaveAmount; i++) {
+                  int localOctave = octaveDuration;
+                  while (localOctave!=0){
+                    final r = Random();
+                    int localDuration = duration[r.nextInt(duration.length)];
+                    while(localOctave-localDuration<0){
+                      localDuration = duration[r.nextInt(duration.length)];
+                    }
+                    var localNote = {
+                      'note': notes[r.nextInt(notes.length)]+"4",
+                      'duration': localDuration,
+                    };
+                    data.add(localNote);
+                    localOctave-=localDuration;
+                  }
+                }
+                print(data);
               },
               child: Text('Confirmar'),
             ),
