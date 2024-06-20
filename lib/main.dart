@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:test2/rutas/generaMelodia.dart';
 import 'package:test2/rutas/practica.dart';
+import 'package:test2/rutas/vistaPrevia.dart';
+import 'package:test2/rutas/cancionesPrecargadas.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,8 +14,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: HomeScreen(),
       routes: {
+        '/cancionesPrecargadas': (context) => CancionesPrecargadas(),
         '/practica': (context) => PracticaScreen(),
         '/generaMelodia': (context) => GeneraMelodiaScreen(),
+        '/vistaPrevia': (context) => MusicSheetDisplayScreen(),
 
       },
     );
@@ -37,7 +41,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => PracticaScreen()),
+                  MaterialPageRoute(builder: (context) => CancionesPrecargadas()),
                 );
               },
             ),
