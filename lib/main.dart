@@ -1,30 +1,39 @@
+
 import 'package:flutter/material.dart';
 import 'package:test2/rutas/generaMelodia.dart';
+import 'package:test2/rutas/lecciones.dart';
 import 'package:test2/rutas/practica.dart';
 import 'package:test2/rutas/vistaPrevia.dart';
 import 'package:test2/rutas/cancionesPrecargadas.dart';
+import 'package:test2/rutas/n_lecciones/leccion1.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomeScreen(),
       routes: {
         '/cancionesPrecargadas': (context) => CancionesPrecargadas(),
         '/practica': (context) => PracticaScreen(),
         '/generaMelodia': (context) => GeneraMelodiaScreen(),
         '/vistaPrevia': (context) => MusicSheetDisplayScreen(),
-
+        '/': (context) => const HomeScreen(),
+        '/lecciones': (context) => const LeccionesScreen(),
+        '/leccion1': (context) => const Leccion1Screen(),
       },
     );
   }
 }
 
+
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +50,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CancionesPrecargadas()),
+                  MaterialPageRoute(builder: (context) => PracticaScreen()),
                 );
               },
             ),
@@ -57,9 +66,12 @@ class HomeScreen extends StatelessWidget {
             ),
             CustomButton(
               text: 'Lecciones',
-              color: Colors.green[200]!,
+              color: Colors.red[200]!,
               onTap: () {
-                // Navigate to Lecciones Screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LeccionesScreen()),
+                );
               },
             ),
             CustomButton(
@@ -81,22 +93,23 @@ class CustomButton extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
-  CustomButton({required this.text, required this.color, required this.onTap});
+  const CustomButton({super.key,required this.text, required this.color, required this.onTap});
+  
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.all(10),
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           text,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
     );
