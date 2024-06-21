@@ -8,8 +8,16 @@ class GeneraMelodiaScreen extends StatefulWidget {
   _GeneraMelodiaScreenState createState() => _GeneraMelodiaScreenState();
 }
 
-var notes = ["C", "D", "E", "F", "G", "A", "B"];
+//Todas las notas del Piano
+var notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+//Solo en el PMV se considera la escala C
+var scales = [[0, 2, 4, 5, 7, 9, 11]];
+//Solo en PMV se consideran acordes mayores y menores
+var chords = [[0, 4, 7], [0, 3, 7]];
+//Solo en PMC se considera negra, blanca y redonda
 var duration = [1, 2, 4];
+//Progresión de acordes clasica
+var chordProggresion = [[0, 3, 4, 4], [0, 0, 3, 4], [0, 3, 0, 4], [0, 3, 4, 3]];
 
 class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
   String selectedDifficulty = "";
@@ -79,26 +87,33 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
     );
   }
   List<Map<String, dynamic>> generateNotesData() {
-    // Handle confirmation action
-    int octaveAmount = 4;
-    int octaveDuration = 4;
-    var data = <Map<String, dynamic>>[];
-    for (var i = 0; i < octaveAmount; i++) {
-      int localOctave = octaveDuration;
-      while (localOctave!=0){
-        final r = Random();
+    int compassAmount = 4; //Numero de compases de la partitura a generar
+    int compassDuration = 4; //Numero de tiempos dentro de cada compas
+    var data = <Map<String, dynamic>>[]; //Datos a devolver
+    final rand = Random(); //Random
+    var selectedScale = scales[rand.nextInt(scales.length)]; //Escala elegida al azar
+    var selectedNotes = selectedScale.map((idx)=> notes[idx]).toList(); //Notas que corresponden a esa escala
+    var selectedProgression = chordProggresion[rand.nextInt(chordProggresion.length)]; //Progresion elegida al azar
+    int diff = selectedProgression == "Fácil" ? 0 : selectedProgression=="Medio" ? 1 : 2; //Dificultad en valor entero
+    for (var i = 0; i < compassAmount; i++) {
+      int localCompass = compassDuration; //Contador de tiempos del compas local
+      int localProgression = selectedProgression[i % selectedProgression.length]; //Nota base del compas local (Nota Corazón)
+      while (localCompass!=0){ 
+        final r = Random(); //Random
+        //TODO: Generar acordes, más probabilidad de acorde a mayor dificultad, mayor probabilidad de que el acorde sea blanca o redonda
         int localDuration = duration[r.nextInt(duration.length)];
-        while(localOctave-localDuration<0){
+        while(localCompass-localDuration<0){
           localDuration = duration[r.nextInt(duration.length)];
         }
         var localNote = {
-          'note': notes[r.nextInt(notes.length)]+"4",
+          'note': selectedNotes[localProgression + r.nextInt(3)]+"4",
           'duration': localDuration,
         };
         data.add(localNote);
-        localOctave-=localDuration;
+        localCompass-=localDuration;
       }
     }
+    print(data);
     return data;
   }
 
