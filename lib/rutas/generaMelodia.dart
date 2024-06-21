@@ -62,6 +62,8 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
             ElevatedButton(
               onPressed: () {
                 // Handle confirmation action
+                int diff = selectedDifficulty=="Fácil"? 0 : selectedDifficulty=="Medio" ? 1 : 2;
+                print(diff);
                 int octaveAmount = 4;
                 int octaveDuration = 4;
                 var data = <Map>[];
