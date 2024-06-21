@@ -30,8 +30,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  #Detección de audio
   tflite: ^1.1.2
   flutter_piano_audio_detection: ^1.0.5
+
+  #Generador De partituras
+  async: ^2.8.2
+  golden_toolkit: ^0.15.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -60,9 +66,14 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  fonts:
+      - family: Bravura
+        fonts:
+            - asset: assets/Bravura.otf
+
   # To add assets to your application, add an assets section, like this:
   assets:
-     - C:\Users\benja\Documents\Flutter\PMV\flutterv1\android\app\src\main\assets\onsets_frames_wavinput.tflite
+  # - C:\Users\Felip\Downloads\flutterv1\android\app\src\main\assets\onsets_frames_wavinput.tflite
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
