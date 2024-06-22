@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:test2/rutas/generaMelodia.dart';
 import 'package:test2/rutas/practica.dart';
+import 'package:test2/widgets/widget_practiceMode/practiceMode.dart';
 import 'package:test2/rutas/vistaPrevia.dart';
 import 'package:test2/rutas/cancionesPrecargadas.dart';
 

@@ -54,14 +54,31 @@ class Note implements MusicObjectStyle {
     );
   }
 
+  BuiltNote buildNote(ClefType clefType) {
+    final noteHeadType = noteDuration.noteHeadType;
+    final noteFlagType = noteDuration.noteFlagType;
+    final stavePosition = StavePosition(pitch.position, clefType);
+
+    return BuiltNote(
+      this,
+      noteHeadType,
+      stavePosition,
+      specifiedMargin,
+      noteFlagType: noteFlagType,
+      accidentalType: accidental,
+      fingering: fingering,
+    );
+  }
+
   @override
-  MusicObjectStyle copyWith(
-          {Pitch? newPitch,
-          NoteDuration? newNoteDuration,
-          Accidental? newAccidental,
-          Fingering? newFingering,
-          Color? newColor,
-          EdgeInsets? newSpecifiedMargin}) =>
+  MusicObjectStyle copyWith({
+    Pitch? newPitch,
+    NoteDuration? newNoteDuration,
+    Accidental? newAccidental,
+    Fingering? newFingering,
+    Color? newColor,
+    EdgeInsets? newSpecifiedMargin,
+  }) =>
       Note(
         pitch: newPitch ?? pitch,
         noteDuration: newNoteDuration ?? noteDuration,
@@ -71,6 +88,7 @@ class Note implements MusicObjectStyle {
         color: newColor ?? color,
       );
 }
+
 
 class BuiltNote implements BuiltObject {
   static const minStemLength = 3.5;
@@ -91,44 +109,44 @@ class BuiltNote implements BuiltObject {
   FingeringRenderer? get _fingeringOnMeasure => fingering != null
       ? FingeringRenderer(fingering!,
           noteUpperHeight: _noteUpperHeight,
-          noteHeadCenterX: _noteHead.noteHeadCenterX)
+          noteHeadCenterX: noteHead.noteHeadCenterX)
       : null;
 
   EdgeInsets get _defaultMargin =>
-      specifiedMargin ?? EdgeInsets.all(_objectWidth / 4);
+      specifiedMargin ?? EdgeInsets.all(objectWidth / 4);
   EdgeInsets get _margin => noteStyle.specifiedMargin ?? _defaultMargin;
 
   bool get _hasAccidental => accidentalType != null;
 
   AccidentalRenderer? get _accidental => _hasAccidental
-      ? AccidentalRenderer(accidentalType!, _localPosition)
+      ? AccidentalRenderer(accidentalType!, localPosition)
       : null;
 
-  double get _accidentalWidth => _accidental?.width ?? 0;
+  double get accidentalWidth => _accidental?.width ?? 0;
 
-  double get _accidentalSpacing => _accidentalWidth / 5;
+  double get accidentalSpacing => accidentalWidth / 5;
 
-  int get _localPosition => stavePosition.localPosition;
-  bool get _isStemUp => _localPosition < 0;
+  int get localPosition => stavePosition.localPosition;
+  bool get _isStemUp => localPosition < 0;
 
   bool get _hasStem => noteHeadType.hasStem;
 
-  NoteHead get _noteHead => NoteHead(
-      noteHeadType, _localPosition, _accidentalWidth + _accidentalSpacing);
+  NoteHead get noteHead => NoteHead(
+      noteHeadType, localPosition, accidentalWidth + accidentalSpacing);
 
   NoteStem? get _noteStem => _hasStem
       ? NoteStem(
           _isStemUp,
-          stemRootOffset: _stemRootOffset,
+          stemRootOffset: stemRootOffset,
           stemTipOffset: _stemTipOffset,
         )
       : null;
 
-  double get _stemX => _isStemUp ? _noteHead.stemUpX : _noteHead.stemDownX;
+  double get stemX => _isStemUp ? noteHead.stemUpX : noteHead.stemDownX;
   double get _stemRootY =>
-      _isStemUp ? _noteHead.stemUpRootY : _noteHead.stemDownRootY;
+      _isStemUp ? noteHead.stemUpRootY : noteHead.stemDownRootY;
 
-  Offset get _stemRootOffset => Offset(_stemX, _stemRootY);
+  Offset get stemRootOffset => Offset(stemX, _stemRootY);
 
   double get _stemTipY {
     if (_hasFlag) return _noteFlag!.stemTipY;
@@ -136,20 +154,20 @@ class BuiltNote implements BuiltObject {
   }
 
   double get _stemUpTipY =>
-      _isStemTipOnCenter ? 0.0 : _noteHead.stemUpRootY - NoteStem.minStemLength;
+      _isStemTipOnCenter ? 0.0 : noteHead.stemUpRootY - NoteStem.minStemLength;
   double get _stemDownTipY => _isStemTipOnCenter
       ? 0.0
-      : _noteHead.stemDownRootY + NoteStem.minStemLength;
+      : noteHead.stemDownRootY + NoteStem.minStemLength;
 
-  Offset get _stemTipOffset => Offset(_stemX, _stemTipY);
+  Offset get _stemTipOffset => Offset(stemX, _stemTipY);
 
   bool get _hasFlag => noteFlagType != null;
 
   NoteFlag? get _noteFlag => _hasFlag
-      ? NoteFlag(_noteHead, noteFlagType!, _isStemUp, _isStemTipOnCenter)
+      ? NoteFlag(noteHead, noteFlagType!, _isStemUp, _isStemTipOnCenter)
       : null;
 
-  bool get _isStemTipOnCenter => _localPosition <= -7 || 7 <= _localPosition;
+  bool get _isStemTipOnCenter => localPosition <= -7 || 7 <= localPosition;
 
   @override
   ObjectOnCanvas placeOnCanvas({
@@ -157,24 +175,24 @@ class BuiltNote implements BuiltObject {
     required double staffLineCenterY,
   }) {
     final helper = ObjectOnCanvasHelper(
-      _bboxWithNoMargin,
+      bboxWithNoMargin,
       Offset(previousObjectsWidthSum, staffLineCenterY),
       _margin,
     );
 
     return NoteRenderer(helper, noteStyle,
-        noteHead: _noteHead,
+        noteHead: noteHead,
         noteStem: _noteStem,
         noteFlag: _noteFlag,
         accidental: _accidental,
-        position: _localPosition,
+        position: localPosition,
         fingering: _fingeringOnMeasure);
   }
 
   double get _fingeringHeight => _fingeringOnMeasure?.upperHeight ?? 0.0;
 
-  double get _noteHeadUpperHeight => _noteHead.upperHeight;
-  double get _noteHeadLowerHeight => _noteHead.lowerHeight;
+  double get _noteHeadUpperHeight => noteHead.upperHeight;
+  double get _noteHeadLowerHeight => noteHead.lowerHeight;
 
   double get _noteFlagUpperHeight => _noteFlag?.upperHeight ?? 0.0;
   double get _noteFlagLowerHeight => _noteFlag?.lowerHeight ?? 0.0;
@@ -209,8 +227,8 @@ class BuiltNote implements BuiltObject {
       ].fold<double>(0.0,
           (previousValue, notePartLower) => max(previousValue, notePartLower));
 
-  Rect get _bboxWithNoMargin =>
-      Rect.fromLTRB(0.0, -_upperWithNoMargin, _objectWidth, _lowerWithNoMargin);
+  Rect get bboxWithNoMargin =>
+      Rect.fromLTRB(0.0, -_upperWithNoMargin, objectWidth, _lowerWithNoMargin);
 
   double get _noteHeadWidth => noteHeadType.width;
 
@@ -226,9 +244,9 @@ class BuiltNote implements BuiltObject {
   double get _noteWidth => _isStemUp ? _upNoteWidth : _downNoteWidth;
 
   @override
-  double get width => _objectWidth + _margin.horizontal;
+  double get width => objectWidth + _margin.horizontal;
 
-  double get _objectWidth => _accidentalWidth + _accidentalSpacing + _noteWidth;
+  double get objectWidth => accidentalWidth + accidentalSpacing + _noteWidth;
 }
 
 class NoteRenderer implements ObjectOnCanvas {

@@ -62,7 +62,7 @@ class MeasureBuilder {
 
   /// Calculates the sum of the widths of the objects in the measure.
   double _objectsWidthSum(List<BuiltObject> objects) =>
-      objects.fold(0.0, (sum, object) => sum + object.width);
+      objects.fold(0, (sum, object) => sum + object.width);
 
   /// Calculates the maximum upper height among the objects in the measure.
   double _objectsUppestHeight(List<BuiltObject> objects) => objects.fold(

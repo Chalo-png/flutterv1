@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test2/widgets/widget_musicSheet/simple_sheet_music.dart';
+import 'package:test2/widgets/widget_musicSheet/src/music_objects/note/note.dart';
 
 class MusicSheetWidget extends StatefulWidget {
   final List<Note> notes;
@@ -35,13 +36,14 @@ class _MusicSheetWidgetState extends State<MusicSheetWidget> {
     final height = screenSize.height / 2;
     final width = screenSize.width;
 
+
     return Scaffold(
       appBar: AppBar(
-
+        automaticallyImplyLeading: false,
       ),
       body: SimpleSheetMusic(
         initialClef: initialClef,
-        margin: const EdgeInsets.all(10),
+        margin: const EdgeInsets.all(75),
         height: height,
         width: width,
         staffs: [staff],

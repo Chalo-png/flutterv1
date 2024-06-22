@@ -10,6 +10,7 @@ class MusicSheetDisplayScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Vista Previa'),
+
       ),
       body: Center(
         child: MusicSheetWidget(notes: notes),
