@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:test2/rutas/generaMelodia.dart';
 import 'package:test2/rutas/lecciones.dart';
 import 'package:test2/rutas/practica.dart';
+import 'package:test2/widgets/widget_practiceMode/practiceMode.dart';
 import 'package:test2/rutas/vistaPrevia.dart';
 import 'package:test2/rutas/cancionesPrecargadas.dart';
 import 'package:test2/rutas/n_lecciones/leccion1.dart';
@@ -50,7 +51,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => PracticaScreen()),
+                  MaterialPageRoute(builder: (context) => CancionesPrecargadas()),
                 );
               },
             ),

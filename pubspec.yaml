@@ -75,6 +75,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/
   # - C:\Users\Felip\Downloads\flutterv1\android\app\src\main\assets\onsets_frames_wavinput.tflite
   #   - images/a_dot_ham.jpeg
 
