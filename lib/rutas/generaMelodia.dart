@@ -16,6 +16,8 @@ var scales = [[0, 2, 4, 5, 7, 9, 11]];
 var chords = [[0, 4, 7], [0, 3, 7]];
 //Solo en PMC se considera negra, blanca y redonda
 var duration = [1, 2, 4];
+var durationProb = [[0.1, 0.3, 0.6], [0.3, 0.4, 0.3], [0.7, 0.2, 0.1]];
+var chordDurarion = [2, 4];
 //Progresión de acordes clasica
 var chordProggresion = [[0, 3, 4, 4], [0, 0, 3, 4], [0, 3, 0, 4], [0, 3, 4, 3]];
 
@@ -94,19 +96,40 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
     var selectedScale = scales[rand.nextInt(scales.length)]; //Escala elegida al azar
     var selectedNotes = selectedScale.map((idx)=> notes[idx]).toList(); //Notas que corresponden a esa escala
     var selectedProgression = chordProggresion[rand.nextInt(chordProggresion.length)]; //Progresion elegida al azar
-    int diff = selectedProgression == "Fácil" ? 0 : selectedProgression=="Medio" ? 1 : 2; //Dificultad en valor entero
+    int diff = selectedDifficulty == 'Fácil' ? 0 : selectedDifficulty=='Medio' ? 1 : 2; //Dificultad en valor entero
     for (var i = 0; i < compassAmount; i++) {
       int localCompass = compassDuration; //Contador de tiempos del compas local
       int localProgression = selectedProgression[i % selectedProgression.length]; //Nota base del compas local (Nota Corazón)
       while (localCompass!=0){ 
         final r = Random(); //Random
-        //TODO: Generar acordes, más probabilidad de acorde a mayor dificultad, mayor probabilidad de que el acorde sea blanca o redonda
-        int localDuration = duration[r.nextInt(duration.length)];
-        while(localCompass-localDuration<0){
-          localDuration = duration[r.nextInt(duration.length)];
-        }
+        String note;
+        int localDuration = 5; //Duración de la nota actual
+        bool isChord = (r.nextInt(10) < diff*2)&&(localCompass>1); //Transformar nota actual en acorde?
+        do {
+          if(isChord){
+            localDuration = chordDurarion[r.nextInt(chordDurarion.length)];
+          }else{
+            var localProb = durationProb[diff];
+            var randDouble = r.nextDouble();
+            double counter = 0.0;
+            for (var j = 0; j < localProb.length; j++) {
+              counter += localProb[j];
+              if(counter>=randDouble){   
+                localDuration = duration[j];
+                break;
+              }
+            }
+          }
+        } while (localCompass-localDuration<0);
+        note = selectedNotes[localProgression + r.nextInt(3)]+"4";
+        /*
+        if(!isChord){
+          note = selectedNotes[localProgression + r.nextInt(3)]+"4";
+        }else{
+
+        }*/
         var localNote = {
-          'note': selectedNotes[localProgression + r.nextInt(3)]+"4",
+          'note': note,
           'duration': localDuration,
         };
         data.add(localNote);
@@ -143,6 +166,10 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
 
   Pitch convertToPitch(String noteName) {
     switch (noteName) {
+      case 'C5':
+        return Pitch.c5;
+      case 'D5':
+        return Pitch.d5;
       case 'A4':
         return Pitch.a4;
       case 'B4':
