@@ -4,9 +4,14 @@ import 'package:test2/rutas/generaMelodia.dart';
 import 'package:test2/widgets/widget_musicSheet/MusicSheetWidget.dart';
 import 'package:test2/widgets/widget_musicSheet/simple_sheet_music.dart';
 import 'package:test2/widgets/widget_musicSheet/src/music_objects/note/note.dart';
+import 'package:flutter_piano_audio_detection/flutter_piano_audio_detection.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 
 class MusicSheetDisplayScreenPracticeMode extends StatefulWidget {
   final List<Note> notes;
+
+  
 
   MusicSheetDisplayScreenPracticeMode({Key? key, required this.notes}) : super(key: key);
 
@@ -21,10 +26,18 @@ class _MusicSheetDisplayScreenPracticeModeState
   int _buttonPressCount = 0;
   double adjust = 30.025;
 
+  //Variables logica tiempo real
+  final isRecording = ValueNotifier<bool>(false);
+  FlutterPianoAudioDetection fpad = FlutterPianoAudioDetection();
+  Stream<List<dynamic>>? result;
+  List<String> realtime_notes = [];
+  String printText = "";
+
   @override
   void initState() {
     super.initState();
-
+    _checkPermission();
+    fpad.prepare();
     for (int i = 0; i < widget.notes.length; i++) {
       if (i == 0) {
         widget.notes[i] = Note(
@@ -41,33 +54,79 @@ class _MusicSheetDisplayScreenPracticeModeState
       }
     }
   }
-
-  void _advanceSheet() {
-    setState(() {
-
-      //SI SE PRESIONA LA NOTA CORRECTA Y DURANTE EL TIEMPO CORRECTO AVANZAR
-      //CÓDIGO AQUI
-      //
-      //
-      //
-      //
-      //---------------------------------------------------------------------
-
-      if (_buttonPressCount < widget.notes.length - 1) {
-        _currentOffset -= _calculateTotalWidth(_buttonPressCount);
-
-        widget.notes[_buttonPressCount + 1] = Note(
-          pitch: widget.notes[_buttonPressCount + 1].pitch,
-          noteDuration: widget.notes[_buttonPressCount + 1].noteDuration,
-          color: Colors.blue,
-        );
-
-        print(_currentOffset);
-
-        _buttonPressCount++;
-      }
-    });
+  Future<void> _checkPermission() async {
+    if (!(await Permission.microphone.isGranted)) {
+      var status = await Permission.microphone.request();
+      if (status != PermissionStatus.granted) {
+        // Permiso denegado, puedes mostrar un mensaje o tomar otra acción
+    }
   }
+}
+
+  void start() {
+    fpad.start();
+    getResult();
+  }
+
+  void stop() {
+    fpad.stop();
+  }
+
+  void getResult() {
+  result = fpad.startAudioRecognition();
+  result!.listen((event) {
+    List<String> updatedNotes = fpad.getNotes(event);
+    
+    // Actualiza realtime_notes sin setState
+    _updateRealtimeNotes(updatedNotes);
+
+    // Aquí decides cuándo llamar a _advanceSheet()
+    if (shouldAdvance()) {
+      _advanceSheet();
+    }
+  });
+  }
+
+  void _updateRealtimeNotes(List<String> updatedNotes) {
+    // Actualiza realtime_notes sin setState
+    realtime_notes = updatedNotes;
+  }
+
+bool shouldAdvance() {
+  // Implementa tu lógica para decidir cuándo avanzar en la partitura
+  // Por ejemplo, puedes comparar realtime_notes con las notas esperadas.
+  // Devuelve true si se cumplen las condiciones para avanzar.
+  Note expectedNote = widget.notes[_buttonPressCount];
+  return _isNoteCorrect(realtime_notes, expectedNote);
+}
+
+void _advanceSheet() {
+  setState(() {
+    if (_buttonPressCount < widget.notes.length - 1) {
+      _currentOffset -= _calculateTotalWidth(_buttonPressCount);
+
+      // Actualiza la nota siguiente en la partitura
+      widget.notes[_buttonPressCount + 1] = Note(
+        pitch: widget.notes[_buttonPressCount + 1].pitch,
+        noteDuration: widget.notes[_buttonPressCount + 1].noteDuration,
+        color: Colors.blue,
+      );
+
+      _buttonPressCount++;
+    }
+  });
+}
+
+bool _isNoteCorrect(List<String> currentNote, Note expectedNote) {
+  String expectedPitch = pitchExtension(expectedNote.pitch);
+  // Comprueba que la altura y duración de la nota son correctas
+  return currentNote.contains(expectedPitch);
+}
+
+String pitchExtension(Pitch pitch) {
+  String name = pitch.toString().split('.').last;
+  return '${name[0].toUpperCase()}${name.substring(1)}';
+}
 
   double _calculateTotalWidth(int count) {
     double width = 0.0;
@@ -77,8 +136,8 @@ class _MusicSheetDisplayScreenPracticeModeState
     width += (buildNote.objectWidth / 2 + buildNoteNext.objectWidth / 2) * adjust;
 
     // Imprimir el ancho actual acumulado
-    print('Nota: ${widget.notes[count].pitch.name.toString()}');
-    print('Ancho actual: ${((buildNote.objectWidth * adjust)).toString()}');
+    //print('Nota: ${widget.notes[count].pitch.name.toString()}');
+    //print('Ancho actual: ${((buildNote.objectWidth * adjust)).toString()}');
 
     return width;
   }
@@ -112,9 +171,31 @@ class _MusicSheetDisplayScreenPracticeModeState
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: _advanceSheet,
-              child: Text('Avanzar partitura'),
+            child: Container(
+              child: ValueListenableBuilder(
+                valueListenable: isRecording,
+                builder: (context, value, widget) {
+                  if (value == false) {
+                    return FloatingActionButton(
+                      onPressed: () {
+                        isRecording.value = true;
+                        start();
+                      },
+                      backgroundColor: Colors.blue,
+                      child: const Icon(Icons.mic),
+                    );
+                  } else {
+                    return FloatingActionButton(
+                      onPressed: () {
+                        isRecording.value = false;
+                        stop();
+                      },
+                      backgroundColor: Colors.red,
+                      child: const Icon(Icons.adjust),
+                    );
+                  }
+                },
+              ),
             ),
           ),
         ],
