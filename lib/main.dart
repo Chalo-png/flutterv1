@@ -7,6 +7,7 @@ import 'package:test2/widgets/widget_practiceMode/practiceMode.dart';
 import 'package:test2/rutas/vistaPrevia.dart';
 import 'package:test2/rutas/cancionesPrecargadas.dart';
 import 'package:test2/rutas/n_lecciones/leccion1.dart';
+import 'package:test2/rutas/generar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/cancionesPrecargadas': (context) => CancionesPrecargadas(),
         '/practica': (context) => PracticaScreen(),
-        '/generaMelodia': (context) => GeneraMelodiaScreen(),
+        '/generaMelodia': (context) => GeneratorDisplayScreen(),
         '/vistaPrevia': (context) => MusicSheetDisplayScreen(),
         '/': (context) => const HomeScreen(),
         '/lecciones': (context) => const LeccionesScreen(),
@@ -61,7 +62,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => GeneraMelodiaScreen()),
+                  MaterialPageRoute(builder: (context) => GeneratorDisplayScreen()),
                 );
               },
             ),

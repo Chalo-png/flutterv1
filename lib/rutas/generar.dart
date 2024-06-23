@@ -1,12 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:test2/widgets/widget_musicSheet/MusicSheetWidget.dart';
 import 'package:test2/widgets/widget_musicSheet/simple_sheet_music.dart';
-
-class GeneraMelodiaScreen extends StatefulWidget {
-  @override
-  _GeneraMelodiaScreenState createState() => _GeneraMelodiaScreenState();
-}
 
 //Todas las notas del Piano
 var notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
@@ -21,72 +17,81 @@ var chordDurarion = [2, 4];
 //Progresión de acordes clasica
 var chordProggresion = [[0, 3, 4, 4], [0, 0, 3, 4], [0, 3, 0, 4], [0, 3, 4, 3]];
 
-class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
-  String selectedDifficulty = "";
+class GeneratorDisplayScreen extends StatefulWidget {
+  @override
+  _DifficultyPageState createState() => _DifficultyPageState();
+}
+class _DifficultyPageState extends State<GeneratorDisplayScreen> {
+  String selectedDifficulty = "Fácil";
   List<Note> generatedNotes = [];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Genera Melodia'),
+        title: const Text("Generar melodia"),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Selecciona dificultad',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                DifficultyButton(
+                  text: 'Fácil',
+                  color: Colors.green,
+                  isSelected: selectedDifficulty == 'Fácil',
+                  onTap: () {
+                    setState(() {
+                      selectedDifficulty = 'Fácil';
+                    });
+                  },
+                ),
+                DifficultyButton(
+                  text: 'Medio',
+                  color: Colors.orange,
+                  isSelected: selectedDifficulty == 'Medio',
+                  onTap: () {
+                    setState(() {
+                      selectedDifficulty = 'Medio';
+                    });
+                  },
+                ),
+                DifficultyButton(
+                  text: 'Difícil',
+                  color: Colors.red,
+                  isSelected: selectedDifficulty == 'Difícil',
+                  onTap: () {
+                    setState(() {
+                      selectedDifficulty = 'Difícil';
+                    });
+                  },
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    generatedNotes = convertToMusicObjects();
+                    setState(() {});
+                  },
+                  child: Text('Confirmar'),
+                ),
+              ],
             ),
-            SizedBox(height: 10),
-            DifficultyButton(
-              text: 'Fácil',
-              color: Colors.green,
-              isSelected: selectedDifficulty == 'Fácil',
-              onTap: () {
-                setState(() {
-                  selectedDifficulty = 'Fácil';
-                });
-              },
+          ),
+          Expanded(
+            child: Container(
+              color: Colors.grey[300],
+              padding: EdgeInsets.all(20.0),
+              alignment: Alignment.center,
+              child: resetCreation(),
             ),
-            DifficultyButton(
-              text: 'Medio',
-              color: Colors.orange,
-              isSelected: selectedDifficulty == 'Medio',
-              onTap: () {
-                setState(() {
-                  selectedDifficulty = 'Medio';
-                });
-              },
-            ),
-            DifficultyButton(
-              text: 'Difícil',
-              color: Colors.red,
-              isSelected: selectedDifficulty == 'Difícil',
-              onTap: () {
-                setState(() {
-                  selectedDifficulty = 'Difícil';
-                });
-              },
-            ),
-            // Boton confirmar
-            ElevatedButton(
-              onPressed: () {
-                List<Note> generatedNotes = convertToMusicObjects();
-                Navigator.pushNamed(
-                  context,
-                  '/vistaPrevia',
-                  arguments: generatedNotes,
-                );
-                print("Confirmar");
-              },
-              child: Text('Confirmar'),
-            ),
-          ],
-        ),
-      ),
+          ),
+        ],
+      )
     );
+  }
+  Widget resetCreation(){
+    return generatedNotes.isEmpty ? const Text("Selecciona una dificultad para crear una canción!") : MusicSheetWidget(notes: generatedNotes,);
   }
   List<Map<String, dynamic>> generateNotesData() {
     int compassAmount = 4; //Numero de compases de la partitura a generar
@@ -202,7 +207,6 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
     }
   }
 }
-
 class DifficultyButton extends StatelessWidget {
   final String text;
   final Color color;
