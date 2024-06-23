@@ -102,9 +102,10 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
       int localProgression = selectedProgression[i % selectedProgression.length]; //Nota base del compas local (Nota Corazón)
       while (localCompass!=0){ 
         final r = Random(); //Random
-        String note;
+        String note; //Nota (o notas) local
         int localDuration = 5; //Duración de la nota actual
-        bool isChord = (r.nextInt(10) < diff*2)&&(localCompass>1); //Transformar nota actual en acorde?
+        bool isChord = false; //Transformar nota actual en acorde?
+        //(r.nextInt(10) < diff*2)&&(localCompass>1); 
         do {
           if(isChord){
             localDuration = chordDurarion[r.nextInt(chordDurarion.length)];
@@ -114,7 +115,7 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
             double counter = 0.0;
             for (var j = 0; j < localProb.length; j++) {
               counter += localProb[j];
-              if(counter>=randDouble){   
+              if(counter>=randDouble){    
                 localDuration = duration[j];
                 break;
               }
