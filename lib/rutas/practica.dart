@@ -8,7 +8,7 @@ class PracticaScreen extends StatefulWidget {
 
 class _PracticaScreenState extends State<PracticaScreen> {
   final isRecording = ValueNotifier<bool>(false);
-  FlutterPianoAudioDetection fpad = new FlutterPianoAudioDetection();
+  FlutterPianoAudioDetection fpad = FlutterPianoAudioDetection();
 
   Stream<List<dynamic>>? result;
   List<String> notes = [];
