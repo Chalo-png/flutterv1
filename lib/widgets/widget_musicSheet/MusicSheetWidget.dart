@@ -23,6 +23,14 @@ class _MusicSheetWidgetState extends State<MusicSheetWidget> {
     initializeMusicObjects();
   }
 
+  @override
+  void didUpdateWidget(MusicSheetWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.notes != widget.notes) {
+      initializeMusicObjects();
+    }
+  }
+
   void initializeMusicObjects() {
     initialClef = const Clef(ClefType.treble);
     musicObjects = [initialClef, ...widget.notes];
@@ -35,7 +43,6 @@ class _MusicSheetWidgetState extends State<MusicSheetWidget> {
     final screenSize = MediaQuery.of(context).size;
     final height = screenSize.height / 2;
     final width = screenSize.width;
-
 
     return Scaffold(
       appBar: AppBar(
