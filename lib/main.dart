@@ -1,16 +1,22 @@
 
 import 'package:flutter/material.dart';
-import 'package:test2/rutas/generaMelodia.dart';
 import 'package:test2/rutas/lecciones.dart';
 import 'package:test2/rutas/practica.dart';
-import 'package:test2/widgets/widget_practiceMode/practiceMode.dart';
 import 'package:test2/rutas/vistaPrevia.dart';
 import 'package:test2/rutas/cancionesPrecargadas.dart';
 import 'package:test2/rutas/n_lecciones/leccion1.dart';
 import 'package:test2/rutas/generar.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MyApp());
+
 }
 
 class MyApp extends StatelessWidget {
