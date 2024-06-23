@@ -71,7 +71,9 @@ class _DifficultyPageState extends State<GeneratorDisplayScreen> {
                 ElevatedButton(
                   onPressed: () {
                     generatedNotes = convertToMusicObjects();
-                    setState(() {});
+                    setState(() {
+                      resetCreation();
+                    });
                   },
                   child: Text('Confirmar'),
                 ),
