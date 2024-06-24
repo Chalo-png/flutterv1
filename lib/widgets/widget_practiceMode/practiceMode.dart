@@ -7,13 +7,11 @@ import 'package:test2/widgets/widget_musicSheet/src/music_objects/note/note.dart
 import 'package:flutter_piano_audio_detection/flutter_piano_audio_detection.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-
 class MusicSheetDisplayScreenPracticeMode extends StatefulWidget {
   final List<Note> notes;
 
-  
-
-  MusicSheetDisplayScreenPracticeMode({Key? key, required this.notes}) : super(key: key);
+  MusicSheetDisplayScreenPracticeMode({Key? key, required this.notes})
+      : super(key: key);
 
   @override
   _MusicSheetDisplayScreenPracticeModeState createState() =>
@@ -26,12 +24,16 @@ class _MusicSheetDisplayScreenPracticeModeState
   int _buttonPressCount = 0;
   double adjust = 30.025;
 
-  //Variables logica tiempo real
+  // Variables logica tiempo real
   final isRecording = ValueNotifier<bool>(false);
   FlutterPianoAudioDetection fpad = FlutterPianoAudioDetection();
   Stream<List<dynamic>>? result;
-  List<String> realtime_notes = [];
+  List<String> realtimeNotes = [];
+  List<String> tempNotes = [];
   String printText = "";
+  Timer? _timer;
+  bool checkear_nota = false;
+  int intento = 0;
 
   @override
   void initState() {
@@ -53,15 +55,24 @@ class _MusicSheetDisplayScreenPracticeModeState
         );
       }
     }
+
+    // Activar automáticamente el botón después de 1 segundo
+    Timer(Duration(seconds: 1), () {
+      if (mounted) {
+        isRecording.value = true;
+        start();
+      }
+    });
   }
+
   Future<void> _checkPermission() async {
     if (!(await Permission.microphone.isGranted)) {
       var status = await Permission.microphone.request();
       if (status != PermissionStatus.granted) {
         // Permiso denegado, puedes mostrar un mensaje o tomar otra acción
+      }
     }
   }
-}
 
   void start() {
     fpad.start();
@@ -73,60 +84,84 @@ class _MusicSheetDisplayScreenPracticeModeState
   }
 
   void getResult() {
-  result = fpad.startAudioRecognition();
-  result!.listen((event) {
-    List<String> updatedNotes = fpad.getNotes(event);
-    
-    // Actualiza realtime_notes sin setState
-    _updateRealtimeNotes(updatedNotes);
+    result = fpad.startAudioRecognition();
+    result!.listen((event) {
+      List<String> updatedNotes = fpad.getNotes(event);
+      Map<String, String> notesDetail = fpad.getKeyNotesAndVelocity(event);
 
-    // Aquí decides cuándo llamar a _advanceSheet()
-    if (shouldAdvance()) {
-      _advanceSheet();
-    }
-  });
+      // Actualiza tempNotes sin setState
+      _updateTempNotes(updatedNotes);
+      // Aquí decides cuándo llamar a _advanceSheet()
+      if (checkear_nota) {
+        if (shouldAdvance()) {
+          _advanceSheet();
+        } else {
+          intento++;
+        }
+      }
+    });
   }
 
-  void _updateRealtimeNotes(List<String> updatedNotes) {
-    // Actualiza realtime_notes sin setState
-    realtime_notes = updatedNotes;
+  void _updateTempNotes(List<String> updatedNotes) {
+    // Añadir solo las notas que no estén ya en tempNotes
+    for (var note in updatedNotes) {
+      if (!tempNotes.contains(note)) {
+        tempNotes.add(note);
+      }
+    }
+
+    if (_timer == null || !_timer!.isActive) {
+      _timer = Timer(Duration(milliseconds: 1000), () {
+        print(tempNotes);
+        checkear_nota = true;
+        realtimeNotes = List.from(tempNotes);
+        tempNotes.clear();
+      });
+    }
   }
 
-bool shouldAdvance() {
-  // Implementa tu lógica para decidir cuándo avanzar en la partitura
-  // Por ejemplo, puedes comparar realtime_notes con las notas esperadas.
-  // Devuelve true si se cumplen las condiciones para avanzar.
-  Note expectedNote = widget.notes[_buttonPressCount];
-  return _isNoteCorrect(realtime_notes, expectedNote);
-}
+  bool shouldAdvance() {
+    // Implementa tu lógica para decidir cuándo avanzar en la partitura
+    // Por ejemplo, puedes comparar realtimeNotes con las notas esperadas.
+    // Devuelve true si se cumplen las condiciones para avanzar.
+    Note expectedNote = widget.notes[_buttonPressCount];
+    return _isNoteCorrect(realtimeNotes, expectedNote);
+  }
 
-void _advanceSheet() {
-  setState(() {
-    if (_buttonPressCount < widget.notes.length - 1) {
-      _currentOffset -= _calculateTotalWidth(_buttonPressCount);
+  void _advanceSheet() {
+    setState(() {
+      if (_buttonPressCount < widget.notes.length ) {
+        _currentOffset -= _calculateTotalWidth(_buttonPressCount);
 
-      // Actualiza la nota siguiente en la partitura
-      widget.notes[_buttonPressCount + 1] = Note(
-        pitch: widget.notes[_buttonPressCount + 1].pitch,
-        noteDuration: widget.notes[_buttonPressCount + 1].noteDuration,
-        color: Colors.blue,
-      );
+        // Actualiza la nota siguiente en la partitura
+        widget.notes[_buttonPressCount + 1] = Note(
+          pitch: widget.notes[_buttonPressCount + 1].pitch,
+          noteDuration: widget.notes[_buttonPressCount + 1].noteDuration,
+          color: Colors.blue,
+        );
 
-      _buttonPressCount++;
-    }
-  });
-}
+        _buttonPressCount++;
+        checkear_nota = false;
 
-bool _isNoteCorrect(List<String> currentNote, Note expectedNote) {
-  String expectedPitch = pitchExtension(expectedNote.pitch);
-  // Comprueba que la altura y duración de la nota son correctas
-  return currentNote.contains(expectedPitch);
-}
+        // Si se toca la última nota, detener la grabación
+        if (_buttonPressCount == widget.notes.length - 1) {
+          isRecording.value = false;
+          stop();
+        }
+      }
+    });
+  }
 
-String pitchExtension(Pitch pitch) {
-  String name = pitch.toString().split('.').last;
-  return '${name[0].toUpperCase()}${name.substring(1)}';
-}
+  bool _isNoteCorrect(List<String> currentNote, Note expectedNote) {
+    String expectedPitch = pitchExtension(expectedNote.pitch);
+    // Comprueba que la altura y duración de la nota son correctas
+    return currentNote.contains(expectedPitch);
+  }
+
+  String pitchExtension(Pitch pitch) {
+    String name = pitch.toString().split('.').last;
+    return '${name[0].toUpperCase()}${name.substring(1)}';
+  }
 
   double _calculateTotalWidth(int count) {
     double width = 0.0;
@@ -134,10 +169,6 @@ String pitchExtension(Pitch pitch) {
     BuiltNote buildNoteNext = widget.notes[count + 1].buildNote(ClefType.treble);
 
     width += (buildNote.objectWidth / 2 + buildNoteNext.objectWidth / 2) * adjust;
-
-    // Imprimir el ancho actual acumulado
-    //print('Nota: ${widget.notes[count].pitch.name.toString()}');
-    //print('Ancho actual: ${((buildNote.objectWidth * adjust)).toString()}');
 
     return width;
   }
@@ -159,7 +190,9 @@ String pitchExtension(Pitch pitch) {
                 ),
                 Positioned(
                   top: 75, // Ajustar según necesidad
-                  left: 139 + (widget.notes[0].buildNote(ClefType.treble).objectWidth/2)*adjust, // Ajustar según necesidad
+                  left: 139 +
+                      (widget.notes[0].buildNote(ClefType.treble).objectWidth / 2) *
+                          adjust, // Ajustar según necesidad
                   child: Container(
                     width: 4, // Ancho de la línea vertical
                     height: 120, // Altura de la línea vertical
@@ -222,16 +255,3 @@ class MusicSheetWidgetAux extends StatelessWidget {
     );
   }
 }
-
-//final List<Note> notes = ModalRoute.of(context)!.settings.arguments as List<Note>;
-//for (Note nota in notas) {
-//BuiltNote buildNote = nota.buildNote(ClefType.treble);
-//print("WIDTH -1 -------->>>>>: ${nota.noteDuration.time.toString()}");
-//print("WIDTH 0 -------->>>>>: ${nota.pitch.position.toString()}");
-//print("WIDTH 1 -------->>>>>: ${buildNote.noteHead.noteHeadCenterX.toString()}");
-//print("WIDTH 2 -------->>>>>: ${buildNote.noteHead.accidentalWidth.toString()}");
-//print("WIDTH 3 -------->>>>>: ${buildNote.accidentalSpacing.toString()}");
-//print("LowerHeight 4 -------->>>>>: ${buildNote.lowerHeight.toString()}");
-//print("ObjectWidth -------->>>>>: ${buildNote.objectWidth.toString()}");
-//print("box -------->>>>>: ${buildNote.bboxWithNoMargin.toString()}");
-//}
