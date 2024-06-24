@@ -70,6 +70,7 @@ class _DifficultyPageState extends State<GeneratorDisplayScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
+                    //TODO: regenerar partitura al clickear confirmar
                     generatedNotes = convertToMusicObjects();
                     setState(() {});
                   },
