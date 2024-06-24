@@ -33,6 +33,7 @@ class _MusicSheetDisplayScreenPracticeModeState
   String printText = "";
   Timer? _timer;
   bool checkear_nota = false;
+  int intento = 0;
 
   @override
   void initState() {
@@ -54,6 +55,14 @@ class _MusicSheetDisplayScreenPracticeModeState
         );
       }
     }
+
+    // Activar automáticamente el botón después de 1 segundo
+    Timer(Duration(seconds: 1), () {
+      if (mounted) {
+        isRecording.value = true;
+        start();
+      }
+    });
   }
 
   Future<void> _checkPermission() async {
@@ -83,8 +92,12 @@ class _MusicSheetDisplayScreenPracticeModeState
       // Actualiza tempNotes sin setState
       _updateTempNotes(updatedNotes);
       // Aquí decides cuándo llamar a _advanceSheet()
-      if (shouldAdvance() && checkear_nota) {
-        _advanceSheet();
+      if (checkear_nota) {
+        if (shouldAdvance()) {
+          _advanceSheet();
+        } else {
+          intento++;
+        }
       }
     });
   }
@@ -98,7 +111,7 @@ class _MusicSheetDisplayScreenPracticeModeState
     }
 
     if (_timer == null || !_timer!.isActive) {
-      _timer = Timer(Duration(milliseconds: 750), () {
+      _timer = Timer(Duration(milliseconds: 1000), () {
         print(tempNotes);
         checkear_nota = true;
         realtimeNotes = List.from(tempNotes);
@@ -117,7 +130,7 @@ class _MusicSheetDisplayScreenPracticeModeState
 
   void _advanceSheet() {
     setState(() {
-      if (_buttonPressCount < widget.notes.length - 1) {
+      if (_buttonPressCount < widget.notes.length ) {
         _currentOffset -= _calculateTotalWidth(_buttonPressCount);
 
         // Actualiza la nota siguiente en la partitura
@@ -129,6 +142,12 @@ class _MusicSheetDisplayScreenPracticeModeState
 
         _buttonPressCount++;
         checkear_nota = false;
+
+        // Si se toca la última nota, detener la grabación
+        if (_buttonPressCount == widget.notes.length - 1) {
+          isRecording.value = false;
+          stop();
+        }
       }
     });
   }
