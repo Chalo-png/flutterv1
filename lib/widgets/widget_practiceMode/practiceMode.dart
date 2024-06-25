@@ -1,16 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:test2/rutas/generaMelodia.dart';
+import 'package:test2/models/user.dart';
 import 'package:test2/widgets/widget_musicSheet/MusicSheetWidget.dart';
 import 'package:test2/widgets/widget_musicSheet/simple_sheet_music.dart';
 import 'package:test2/widgets/widget_musicSheet/src/music_objects/note/note.dart';
 import 'package:flutter_piano_audio_detection/flutter_piano_audio_detection.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../models/practicaM.dart';
+
 class MusicSheetDisplayScreenPracticeMode extends StatefulWidget {
   final List<Note> notes;
+  final int? songId;
 
-  MusicSheetDisplayScreenPracticeMode({Key? key, required this.notes})
+  MusicSheetDisplayScreenPracticeMode({Key? key, required this.notes, this.songId})
       : super(key: key);
 
   @override
@@ -18,11 +21,13 @@ class MusicSheetDisplayScreenPracticeMode extends StatefulWidget {
       _MusicSheetDisplayScreenPracticeModeState();
 }
 
-class _MusicSheetDisplayScreenPracticeModeState
-    extends State<MusicSheetDisplayScreenPracticeMode> {
+class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayScreenPracticeMode> {
   double _currentOffset = 0.0;
   int _buttonPressCount = 0;
   double adjust = 30.025;
+
+  // Initialize songId directly from widget
+  int? get songId => widget.songId;
 
   // Variables logica tiempo real
   final isRecording = ValueNotifier<bool>(false);
@@ -32,6 +37,7 @@ class _MusicSheetDisplayScreenPracticeModeState
   List<String> tempNotes = [];
   String printText = "";
   Timer? _timer;
+  Stopwatch _stopwatch = Stopwatch();
   bool checkear_nota = false;
   int intento = 0;
 
@@ -76,23 +82,25 @@ class _MusicSheetDisplayScreenPracticeModeState
 
   void start() {
     fpad.start();
+    _stopwatch.start();
     getResult();
   }
 
   void stop() {
     fpad.stop();
+    _stopwatch.stop();
+    handleSave();
   }
 
   void getResult() {
     result = fpad.startAudioRecognition();
     result!.listen((event) {
       List<String> updatedNotes = fpad.getNotes(event);
-      Map<String, String> notesDetail = fpad.getKeyNotesAndVelocity(event);
 
       // Actualiza tempNotes sin setState
       _updateTempNotes(updatedNotes);
-      // Aquí decides cuándo llamar a _advanceSheet()
-      if (checkear_nota) {
+
+      if (checkear_nota && updatedNotes.isNotEmpty) {
         if (shouldAdvance()) {
           _advanceSheet();
         } else {
@@ -130,7 +138,7 @@ class _MusicSheetDisplayScreenPracticeModeState
 
   void _advanceSheet() {
     setState(() {
-      if (_buttonPressCount < widget.notes.length ) {
+      if (_buttonPressCount < widget.notes.length -1 ) {
         _currentOffset -= _calculateTotalWidth(_buttonPressCount);
 
         // Actualiza la nota siguiente en la partitura
@@ -142,13 +150,13 @@ class _MusicSheetDisplayScreenPracticeModeState
 
         _buttonPressCount++;
         checkear_nota = false;
-
-        // Si se toca la última nota, detener la grabación
-        if (_buttonPressCount == widget.notes.length - 1) {
-          isRecording.value = false;
-          stop();
-        }
       }
+        // Si se toca la última nota, detener la grabación
+      else {
+        isRecording.value = false;
+        stop();
+      }
+
     });
   }
 
@@ -171,6 +179,51 @@ class _MusicSheetDisplayScreenPracticeModeState
     width += (buildNote.objectWidth / 2 + buildNoteNext.objectWidth / 2) * adjust;
 
     return width;
+  }
+  List<PracticaM> setupPracticaForSave(int songId, int cantAciertos, double tasaAciertos, int elapsedTime) {
+    PracticaM practica = PracticaM(
+      songId: songId,
+      cantAciertos: cantAciertos,
+      tasaAciertos: tasaAciertos,
+      songSpeed: 1.0,
+      sentimiento: "happy",
+      secondsToComplete: elapsedTime,
+    );
+    List<PracticaM> practicaList = [];
+    practicaList.add(practica);
+    return practicaList;
+  }
+  User setupUserForSave(List<PracticaM> practica, int userId, String email, String password, String userType) {
+
+    User user = User(
+      id: userId,
+      email: email,
+      password: password,
+      userType: userType,
+      practicas: practica,  // Optional practica object
+    );
+
+    return user;
+  }
+  double getTasaAciertos() {
+    //aciertos/total
+    double res = widget.notes.length/widget.notes.length + intento;
+    return res;
+  }
+
+  void handleSave() {
+    if(songId != null) {
+      int cantNotas = widget.notes.length;
+      double tasaAciertos = getTasaAciertos();
+      int elapsedTime = _stopwatch.elapsed.inSeconds;
+      List<PracticaM> currPracticaAsList = setupPracticaForSave( songId!, cantNotas, tasaAciertos, elapsedTime);
+      String email =  "user@example.com";
+      String password = "securePassword";
+      String userType = "Alumno";
+      User currUser = setupUserForSave(currPracticaAsList, 1, email, password, userType);
+
+      storeUser(currUser);
+    }
   }
 
   @override

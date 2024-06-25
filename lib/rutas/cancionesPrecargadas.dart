@@ -258,6 +258,7 @@ final List<Note> driveByNotas = [
 ];
 
 class Cancion {
+  final int id;
   final String titulo;
   final String genero;
   final int dificultad;
@@ -265,6 +266,7 @@ class Cancion {
   final List<Note> notas;
 
   Cancion({
+    required this.id,
     required this.titulo,
     required this.genero,
     required this.dificultad,
@@ -280,11 +282,11 @@ class CancionesPrecargadas extends StatefulWidget {
 
 class _CancionesPrecargadasState extends State<CancionesPrecargadas> {
   final List<Cancion> _canciones = [
-    Cancion(titulo: 'Estrellita donde estas', genero: 'Infantil', dificultad: 1, duracion: '3 m', notas: estrellitaNotas),
-    Cancion(titulo: 'Run run se fue pal norte', genero: 'Folclor', dificultad: 2, duracion: '3 m 23 s', notas: runRunNotas),
-    Cancion(titulo: 'Memories', genero: 'Infantil', dificultad: 2, duracion: '3 m 40 s', notas: memoriesNotas),
-    Cancion(titulo: 'Drive by', genero: 'Soul', dificultad: 3, duracion: '3 m', notas: driveByNotas),
-    Cancion(titulo: 'Test Song', genero: 'Test', dificultad: 5, duracion: '2 m', notas: testSong),
+    Cancion(id:1, titulo: 'Estrellita donde estas', genero: 'Infantil', dificultad: 1, duracion: '3 m', notas: estrellitaNotas),
+    Cancion(id:2, titulo: 'Run run se fue pal norte', genero: 'Folclor', dificultad: 2, duracion: '3 m 23 s', notas: runRunNotas),
+    Cancion(id:3, titulo: 'Memories', genero: 'Infantil', dificultad: 2, duracion: '3 m 40 s', notas: memoriesNotas),
+    Cancion(id:4, titulo: 'Drive by', genero: 'Soul', dificultad: 3, duracion: '3 m', notas: driveByNotas),
+    Cancion(id:5, titulo: 'Test Song', genero: 'Test', dificultad: 5, duracion: '2 m', notas: testSong),
   ];
 
   @override
@@ -313,7 +315,7 @@ class _CancionesPrecargadasState extends State<CancionesPrecargadas> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MusicSheetDisplayScreenPracticeMode(notes: cancion.notas),
+                  builder: (context) => MusicSheetDisplayScreenPracticeMode(notes: cancion.notas, songId: cancion.id),
                 ),
               );
             },

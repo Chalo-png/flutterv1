@@ -4,101 +4,77 @@ import 'package:test2/models/practicaM.dart';
 import 'leccionM.dart';
 
 class User {
-  int id;
-  String email;
-  String password;
-  String userType;
-  PracticaM? practica;  // Optional field
-  LeccionM? leccion;    // Optional field
+  final int id;
+  final String email;
+  final String password;
+  final String userType;
+  final List<PracticaM>? practicas;
+  final List<LeccionM>? lecciones;
 
   User({
     required this.id,
     required this.email,
     required this.password,
     required this.userType,
-    this.practica,
-    this.leccion,
+    this.practicas,
+    this.lecciones,
   });
 
-  // Convert a User object into a JSON object
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = {
+    return {
       'id': id,
       'email': email,
       'password': password,
-      'user_type': userType,
+      'userType': userType,
+      'practicas': practicas?.map((p) => p.toJson()).toList(),
+      'lecciones': lecciones?.map((l) => l.toJson()).toList(),
     };
-
-    // Add practica if it is not null
-    if (practica != null) {
-      data['practica'] = practica!.toJson();
-    }
-
-    // Add leccion if it is not null
-    if (leccion != null) {
-      data['leccion'] = leccion!.toJson();
-    }
-
-    return data;
   }
 
-  // Create a User object from a JSON object
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
       email: json['email'],
       password: json['password'],
-      userType: json['user_type'],
-      practica: json['practica'] != null
-          ? PracticaM.fromJson(json['practica'])
-          : null,
-      leccion: json['leccion'] != null
-          ? LeccionM.fromJson(json['leccion'])
-          : null,
+      userType: json['userType'],
+      practicas: (json['practicas'] as List<dynamic>?)
+          ?.map((p) => PracticaM.fromJson(p))
+          .toList(),
+      lecciones: (json['lecciones'] as List<dynamic>?)
+          ?.map((l) => LeccionM.fromJson(l))
+          .toList(),
     );
   }
 }
 
-void storeUser(User user) async {
-  // Get a reference to the Firestore instance
+Future<void> storeUser(User user) async {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final userDoc = firestore.collection('users').doc(user.id.toString());
 
-  // Convert the User object to JSON
-  Map<String, dynamic> userJson = user.toJson();
+  // Get the existing user data
+  final snapshot = await userDoc.get();
 
-  // Store the JSON object in Firestore
-  await firestore.collection('users').doc(user.id.toString()).set(userJson);
-}
+  if (snapshot.exists) {
+    // If user exists, update the practicas and lecciones
+    List<dynamic> existingPracticas = snapshot.data()?['practicas'] ?? [];
+    List<dynamic> existingLecciones = snapshot.data()?['lecciones'] ?? [];
 
-void main() {
-  // Create a PracticaM object
-  PracticaM practica = PracticaM(
-    id: 1,
-    songId: 123,
-    cantAciertos: 50,
-    tasaAciertos: 0.9,
-    songSpeed: 1.0,
-    sentimiento: "happy",
-    secondsToComplete: 300,
-  );
+    // Ensure practicas and lecciones are not null
+    if (user.practicas != null) {
+      existingPracticas.addAll(user.practicas!.map((p) => p.toJson()));
+    }
 
-  // Create a LeccionM object
-  LeccionM leccion = LeccionM(
-    leccionId: 1,
-    completed: true,
-    sentimiento: "satisfied",
-  );
+    if (user.lecciones != null) {
+      existingLecciones.addAll(user.lecciones!.map((l) => l.toJson()));
+    }
 
-  // Create a User object with optional PracticaM and LeccionM objects
-  User user = User(
-    id: 1,
-    email: "user@example.com",
-    password: "securePassword",
-    userType: "admin",
-    practica: practica,  // Optional practica object
-    leccion: leccion,    // Optional leccion object
-  );
-
-  // Store the User object in Firestore
-  storeUser(user);
+    // Update the user document
+    await userDoc.update({
+      'practicas': existingPracticas,
+      'lecciones': existingLecciones,
+    });
+  } else {
+    // If user does not exist, create a new document
+    await userDoc.set(user.toJson());
+  }
 }

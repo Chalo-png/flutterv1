@@ -1,6 +1,6 @@
 
 class PracticaM {
-  int id;
+
   int songId;
   int cantAciertos;
   double tasaAciertos;
@@ -9,7 +9,6 @@ class PracticaM {
   int secondsToComplete;
 
   PracticaM({
-    required this.id,
     required this.songId,
     required this.cantAciertos,
     required this.tasaAciertos,
@@ -21,7 +20,6 @@ class PracticaM {
   // Convert a PracticaM object into a JSON object
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'song_id': songId,
       'cant_aciertos': cantAciertos,
       'tasa_aciertos': tasaAciertos,
@@ -34,7 +32,6 @@ class PracticaM {
   // Create a PracticaM object from a JSON object
   factory PracticaM.fromJson(Map<String, dynamic> json) {
     return PracticaM(
-      id: json['id'],
       songId: json['song_id'],
       cantAciertos: json['cant_aciertos'],
       tasaAciertos: json['tasa_aciertos'],
