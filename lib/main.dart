@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:test2/rutas/lecciones.dart';
 import 'package:test2/rutas/practica.dart';
@@ -9,14 +8,13 @@ import 'package:test2/rutas/generar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   runApp(const MyApp());
-
 }
 
 class MyApp extends StatelessWidget {
@@ -38,7 +36,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -58,7 +55,8 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CancionesPrecargadas()),
+                  MaterialPageRoute(
+                      builder: (context) => CancionesPrecargadas()),
                 );
               },
             ),
@@ -68,7 +66,8 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => GeneratorDisplayScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => GeneratorDisplayScreen()),
                 );
               },
             ),
@@ -78,7 +77,8 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const LeccionesScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const LeccionesScreen()),
                 );
               },
             ),
@@ -101,8 +101,11 @@ class CustomButton extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
-  const CustomButton({super.key,required this.text, required this.color, required this.onTap});
-  
+  const CustomButton(
+      {super.key,
+      required this.text,
+      required this.color,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
