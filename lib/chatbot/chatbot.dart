@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bbb/opciones.dart';
+import 'package:test2/chatbot/opciones.dart';
 import 'dart:async';
 
 class Chatbot extends StatefulWidget {
