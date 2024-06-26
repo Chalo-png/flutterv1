@@ -38,7 +38,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
   String printText = "";
   Timer? _timer;
   Stopwatch _stopwatch = Stopwatch();
-  bool checkear_nota = false;
+  bool checkear_nota = true;
   int intento = 0;
   double aciertosSave = 0.0;
 
@@ -125,7 +125,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
     }
 
     if (_timer == null || !_timer!.isActive) {
-      _timer = Timer(Duration(milliseconds: 1000), () {
+      _timer = Timer(Duration(milliseconds: 2000), () {
         print(tempNotes);
         checkear_nota = true;
         realtimeNotes = List.from(tempNotes);
@@ -139,7 +139,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
     // Por ejemplo, puedes comparar realtimeNotes con las notas esperadas.
     // Devuelve true si se cumplen las condiciones para avanzar.
     Note expectedNote = widget.notes[_buttonPressCount];
-    return _isNoteCorrect(realtimeNotes, expectedNote);
+    return _isNoteCorrect(tempNotes, expectedNote);
   }
 
   void _advanceSheet() {
@@ -302,67 +302,107 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Modo práctica'),
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Stack(
+    return WillPopScope(
+      onWillPop: () async {
+        // Mostrar un diálogo o realizar alguna acción personalizada
+        bool shouldPop = await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('¿Qué deseas hacer?'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Positioned(
-                  left: _currentOffset,
-                  child: MusicSheetWidgetAux(notes: widget.notes),
+                ElevatedButton(
+                  onPressed: () {
+                    stop(false);
+                    Navigator.pushNamed(context, '/cancionesPrecargadas'); // Volver a canciones
+                  },
+                  child: Text('Volver a Canciones'),
                 ),
-                Positioned(
-                  top: 75, // Ajustar según necesidad
-                  left: 139 +
-                      (widget.notes[0].buildNote(ClefType.treble).objectWidth / 2) * adjust, // Ajustar según necesidad
-                  child: Container(
-                    width: 4, // Ancho de la línea vertical
-                    height: 120, // Altura de la línea vertical
-                    color: Colors.blueGrey, // Color de la línea vertical
-                  ),
+                
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Logic to repeat the song
+                    repeatSong();
+                  },
+                  child: Text('Repetir Canción'),
                 ),
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              child: ValueListenableBuilder(
-                valueListenable: isRecording,
-                builder: (context, value, widget) {
-                  if (value == false) {
-                    return FloatingActionButton(
-                      onPressed: () {
-                        isRecording.value = true;
-                        start();
-                      },
-                      backgroundColor: Colors.blue,
-                      child: const Icon(Icons.mic),
-                    );
-                  } else {
-                    return FloatingActionButton(
-                      onPressed: () {
-                        isRecording.value = false;
-                        stop(false);
-                      },
-                      backgroundColor: Colors.red,
-                      child: const Icon(Icons.adjust),
-                    );
-                  }
-                },
+        );
+
+        // Si shouldPop es null, significa que se cerró el diálogo sin elegir ninguna opción
+        // Devuelve false para evitar que Flutter maneje el pop
+        return shouldPop != null;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Modo práctica'),
+        ),
+        body: Column(
+          children: <Widget>[
+            Expanded(
+              child: Stack(
+                children: [
+                  // Ajusta según tu implementación de MusicSheetWidgetAux
+                  Positioned(
+                    left: _currentOffset,
+                    child: MusicSheetWidgetAux(notes: widget.notes),
+                  ),
+                  Positioned(
+                    top: 75, // Ajustar según necesidad
+                    left: 139 +
+                        (widget.notes[0]
+                                .buildNote(ClefType.treble)
+                                .objectWidth /
+                            2) *
+                            adjust, // Ajustar según necesidad
+                    child: Container(
+                      width: 4, // Ancho de la línea vertical
+                      height: 120, // Altura de la línea vertical
+                      color: Colors.blueGrey, // Color de la línea vertical
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                child: ValueListenableBuilder(
+                  valueListenable: isRecording,
+                  builder: (context, value, widget) {
+                    if (value == false) {
+                      return FloatingActionButton(
+                        onPressed: () {
+                          isRecording.value = true;
+                          start();
+                        },
+                        backgroundColor: Colors.blue,
+                        child: const Icon(Icons.mic),
+                      );
+                    } else {
+                      return FloatingActionButton(
+                        onPressed: () {
+                          isRecording.value = false;
+                          stop(false);
+                        },
+                        backgroundColor: Colors.red,
+                        child: const Icon(Icons.adjust),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
 class MusicSheetWidgetAux extends StatelessWidget {
   final List<Note> notes;
 

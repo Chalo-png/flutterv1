@@ -53,11 +53,7 @@ class HomeScreen extends StatelessWidget {
               text: 'Practica',
               color: Colors.yellow,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => CancionesPrecargadas()),
-                );
+                Navigator.pushNamed(context, '/cancionesPrecargadas');
               },
             ),
             CustomButton(
