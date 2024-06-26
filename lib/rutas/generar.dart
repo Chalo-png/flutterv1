@@ -1,8 +1,9 @@
-import 'package:flutter/cupertino.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:test2/widgets/widget_musicSheet/MusicSheetWidget.dart';
 import 'package:test2/widgets/widget_musicSheet/simple_sheet_music.dart';
+import 'package:test2/widgets/widget_practiceMode/practiceMode.dart';
 
 //Todas las notas del Piano
 var notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
@@ -17,13 +18,22 @@ var chordDurarion = [2, 4];
 //Progresión de acordes clasica
 var chordProggresion = [[0, 3, 4, 4], [0, 0, 3, 4], [0, 3, 0, 4], [0, 3, 4, 3]];
 
+
 class GeneratorDisplayScreen extends StatefulWidget {
   @override
   _DifficultyPageState createState() => _DifficultyPageState();
 }
 class _DifficultyPageState extends State<GeneratorDisplayScreen> {
+  AudioPlayer _audioPlayer = AudioPlayer();
+  var _notesToPlay = [];
+  int _currentIndex = 0;
+  bool _isPlaying = false;
+
   String selectedDifficulty = "Fácil";
   List<Note> generatedNotes = [];
+  bool clicked = false;
+  var _data = [];
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,9 +80,9 @@ class _DifficultyPageState extends State<GeneratorDisplayScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    //TODO: regenerar partitura al clickear confirmar
                     generatedNotes = convertToMusicObjects();
                     setState(() {
+                      clicked = true;
                       resetCreation();
                     });
                   },
@@ -89,12 +99,93 @@ class _DifficultyPageState extends State<GeneratorDisplayScreen> {
               child: resetCreation(),
             ),
           ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: clicked? Colors.green: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+            ),
+            onPressed: () {
+              if(generatedNotes.length!=0){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MusicSheetDisplayScreenPracticeMode(notes: generatedNotes),
+                  ),
+                );
+              }
+            },
+            child: Text('¡Practicar!'),
+          ),
         ],
       )
     );
   }
+  Future<void> playNotes(var notes) async {
+    if(notes!=_notesToPlay){
+      _notesToPlay = notes;
+      // Detener la reproducción actual si está en curso
+      await stop();
+      await Future.delayed(Duration(milliseconds: 500));
+      if(notes==_notesToPlay){
+        _currentIndex = 0;
+        _isPlaying = true;
+        await _playNextNote();
+      }
+    }
+  }
+  Future<void> _playNextNote() async {
+    print(_notesToPlay);
+    for (var currentNote in _notesToPlay) {
+      if(_isPlaying){
+        String soundPath = '${currentNote['note']}.mp3'; // Ruta al archivo de sonido
+
+        await _audioPlayer.play(AssetSource(soundPath)); // Reproducir el sonido
+
+        await Future.delayed(Duration(seconds: currentNote['duration'])); // Esperar la duración de la nota
+        if(_audioPlayer!=null){
+          await _audioPlayer.release();
+        }
+      }else{
+        break;
+      }
+    }
+    _isPlaying = false;
+    /*
+    while(_isPlaying && _currentIndex < _notesToPlay.length) {
+      var currentNote = _notesToPlay[_currentIndex];
+
+      String soundPath = '${currentNote['note']}.mp3'; // Ruta al archivo de sonido
+
+      await _audioPlayer.play(AssetSource(soundPath)); // Reproducir el sonido
+
+      await Future.delayed(Duration(seconds: currentNote['duration'])); // Esperar la duración de la nota
+      
+      if(_audioPlayer!=null){
+        await _audioPlayer.release();
+      }
+      
+      _currentIndex++;
+    }
+    _isPlaying = false;
+    */
+  }
+
+  Future<void> stop() async {
+    await _audioPlayer.stop();
+    _isPlaying = false;
+    _currentIndex = 0;
+  }
   Widget resetCreation(){
-    return generatedNotes.isEmpty ? const Text("Selecciona una dificultad para crear una canción!") : MusicSheetWidget(notes: generatedNotes,);
+    _audioPlayer.setReleaseMode(ReleaseMode.release);
+    var creation =  generatedNotes.isEmpty ? const Text("Selecciona una dificultad para crear una canción!") : MusicSheetWidget(notes: generatedNotes,);
+    playNotes(_data);
+    return creation;
+  }
+  @override
+  void dispose(){
+    _audioPlayer.stop();
+    _audioPlayer.dispose();
+    super.dispose();
   }
   List<Map<String, dynamic>> generateNotesData() {
     int compassAmount = 4; //Numero de compases de la partitura a generar
@@ -145,6 +236,7 @@ class _DifficultyPageState extends State<GeneratorDisplayScreen> {
         localCompass-=localDuration;
       }
     }
+    _data = data;
     return data;
   }
 

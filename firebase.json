@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"piano-colors","appId":"1:13807650100:android:e54722753894eb40b8d161","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"piano-colors","configurations":{"android":"1:13807650100:android:e54722753894eb40b8d161","ios":"1:13807650100:ios:c59e496f4a90ff25b8d161"}}}}}}
