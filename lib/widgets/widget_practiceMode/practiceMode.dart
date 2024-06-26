@@ -39,7 +39,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
   Timer? _timer;
   Stopwatch _stopwatch = Stopwatch();
   bool checkear_nota = true;
-  int intento = 0;
+  int fallas = 0;
   double aciertosSave = 0.0;
 
   @override
@@ -47,6 +47,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
     super.initState();
     _checkPermission();
     fpad.prepare();
+    tempNotes.clear();
     for (int i = 0; i < widget.notes.length; i++) {
       if (i == 0) {
         widget.notes[i] = Note(
@@ -106,11 +107,13 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
       // Actualiza tempNotes sin setState
       _updateTempNotes(updatedNotes);
 
-      if (checkear_nota && updatedNotes.isNotEmpty) {
+      if (checkear_nota && tempNotes.isNotEmpty) {
+        print(tempNotes);
         if (shouldAdvance()) {
           _advanceSheet();
         } else {
-          intento++;
+          tempNotes.clear();
+          fallas++;
         }
       }
     });
@@ -126,7 +129,6 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
 
     if (_timer == null || !_timer!.isActive) {
       _timer = Timer(Duration(milliseconds: 2000), () {
-        print(tempNotes);
         checkear_nota = true;
         realtimeNotes = List.from(tempNotes);
         tempNotes.clear();
@@ -160,6 +162,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
       // Si se toca la última nota, detener la grabación
       else {
         if(isRecording.value==true){
+          tempNotes.clear();
           isRecording.value = false;
           stop(true);
         }
@@ -216,7 +219,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
 
   double getTasaAciertos() {
     //aciertos/total
-    double res = widget.notes.length / (widget.notes.length + intento);
+    double res = widget.notes.length / (widget.notes.length + fallas);
     aciertosSave = res;
     return res;
   }
@@ -246,7 +249,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
             Container(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center, 
-                children: songId!=null ? <Widget>[Text("Tasa de aciertos ${aciertosSave}"), Text('¿Quieres repetir la canción o volver al menú principal?')]:<Widget>[Text('¿Quieres repetir la canción o volver al menú principal?')], 
+                children: songId!=null ? <Widget>[Text("Tasa de aciertos ${aciertosSave} + Cantidad de notas ${widget.notes.length} + intentos ${fallas}"), Text('¿Quieres repetir la canción o volver al menú principal?')]:<Widget>[Text('¿Quieres repetir la canción o volver al menú principal?')], 
             ),
             ),
           actions: <Widget>[
@@ -274,6 +277,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
 
   void repeatSong() {
     setState(() {
+      tempNotes.clear();
       _buttonPressCount = 0;
       _currentOffset = 0.0;
       for (int i = 0; i < widget.notes.length; i++) {
