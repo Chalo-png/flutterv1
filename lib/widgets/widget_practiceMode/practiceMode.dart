@@ -6,6 +6,7 @@ import 'package:test2/widgets/widget_musicSheet/simple_sheet_music.dart';
 import 'package:test2/widgets/widget_musicSheet/src/music_objects/note/note.dart';
 import 'package:flutter_piano_audio_detection/flutter_piano_audio_detection.dart';
 import 'package:permission_handler/permission_handler.dart';
+import "package:test2/chatbot/emociones.dart";
 
 import '../../models/practicaM.dart';
 
@@ -41,8 +42,8 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
   bool checkear_nota = true;
   int fallas = 0;
   double aciertosSave = 0.0;
-
-  List<Note> displayNotes = [];
+ String sentimiento = "default";
+ List<Note> displayNotes = [];
 
   @override
   void initState() {
@@ -92,15 +93,41 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
     getResult();
   }
 
-  void stop(bool showDialog) {
+  void stop(bool showDialog) async {
     fpad.stop();
     _stopwatch.stop();
-    if (showDialog) {
+     if (showDialog) {
       if (songId != null) {
-        handleSave();
+       await showDialogWithEmocionesCard().then((selectedSentimiento){
+          if(selectedSentimiento != null) {
+            updateSentimiento(selectedSentimiento);
+          }
+        });
+        await handleSave(); // Espera a que handleSave() termine
       }
       showEndDialog();
     }
+  }
+  Future<String?> showDialogWithEmocionesCard() async {
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: EmocionesCard(
+            TipoActividad: "practice",
+            onSentimientoSelected: (sentimiento) {
+              Navigator.of(context).pop(sentimiento);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void updateSentimiento(String newSentimiento) {
+    setState(() {
+      sentimiento = newSentimiento;
+    });
   }
 
   void getResult() {
@@ -204,7 +231,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
       cantAciertos: cantAciertos,
       tasaAciertos: tasaAciertos,
       songSpeed: 1.0,
-      sentimiento: "happy",
+      sentimiento: sentimiento,
       secondsToComplete: elapsedTime,
     );
     List<PracticaM> practicaList = [];
@@ -231,16 +258,17 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
     return res;
   }
 
-  void handleSave() {
+  Future<void> handleSave() async {
     if (songId != null) {
       int cantNotas = widget.notes.length;
       double tasaAciertos = getTasaAciertos();
       int elapsedTime = _stopwatch.elapsed.inSeconds;
+
       List<PracticaM> currPracticaAsList = setupPracticaForSave(songId!, cantNotas, tasaAciertos, elapsedTime);
       String email = "user@example.com";
       String password = "securePassword";
       String userType = "Alumno";
-      User currUser = setupUserForSave(currPracticaAsList, 1, email, password, userType);
+      User currUser = setupUserForSave(currPracticaAsList, 2, email, password, userType);
 
       storeUser(currUser);
     }
