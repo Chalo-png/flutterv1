@@ -106,6 +106,7 @@ class _DifficultyPageState extends State<GeneratorDisplayScreen> {
             ),
             onPressed: () {
               if(generatedNotes.length!=0){
+                _isPlaying = false;
                 Navigator.push(
                   context,
                   MaterialPageRoute(

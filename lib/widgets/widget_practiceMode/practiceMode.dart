@@ -40,6 +40,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
   Stopwatch _stopwatch = Stopwatch();
   bool checkear_nota = false;
   int intento = 0;
+  double aciertosSave = 0.0;
 
   @override
   void initState() {
@@ -86,10 +87,15 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
     getResult();
   }
 
-  void stop() {
+  void stop(bool showDialog) {
     fpad.stop();
     _stopwatch.stop();
-    handleSave();
+    if(showDialog){
+      if(songId!=null){
+        handleSave();
+      }
+      showEndDialog();
+    }
   }
 
   void getResult() {
@@ -138,7 +144,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
 
   void _advanceSheet() {
     setState(() {
-      if (_buttonPressCount < widget.notes.length -1 ) {
+      if (_buttonPressCount < widget.notes.length - 1) {
         _currentOffset -= _calculateTotalWidth(_buttonPressCount);
 
         // Actualiza la nota siguiente en la partitura
@@ -151,12 +157,13 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
         _buttonPressCount++;
         checkear_nota = false;
       }
-        // Si se toca la última nota, detener la grabación
+      // Si se toca la última nota, detener la grabación
       else {
-        isRecording.value = false;
-        stop();
+        if(isRecording.value==true){
+          isRecording.value = false;
+          stop(true);
+        }
       }
-
     });
   }
 
@@ -180,6 +187,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
 
     return width;
   }
+
   List<PracticaM> setupPracticaForSave(int songId, int cantAciertos, double tasaAciertos, int elapsedTime) {
     PracticaM practica = PracticaM(
       songId: songId,
@@ -193,37 +201,103 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
     practicaList.add(practica);
     return practicaList;
   }
-  User setupUserForSave(List<PracticaM> practica, int userId, String email, String password, String userType) {
 
+  User setupUserForSave(List<PracticaM> practica, int userId, String email, String password, String userType) {
     User user = User(
       id: userId,
       email: email,
       password: password,
       userType: userType,
-      practicas: practica,  // Optional practica object
+      practicas: practica, // Optional practica object
     );
 
     return user;
   }
+
   double getTasaAciertos() {
     //aciertos/total
-    double res = widget.notes.length/widget.notes.length + intento;
+    double res = widget.notes.length / (widget.notes.length + intento);
+    aciertosSave = res;
     return res;
   }
 
   void handleSave() {
-    if(songId != null) {
+    if (songId != null) {
       int cantNotas = widget.notes.length;
       double tasaAciertos = getTasaAciertos();
       int elapsedTime = _stopwatch.elapsed.inSeconds;
-      List<PracticaM> currPracticaAsList = setupPracticaForSave( songId!, cantNotas, tasaAciertos, elapsedTime);
-      String email =  "user@example.com";
+      List<PracticaM> currPracticaAsList = setupPracticaForSave(songId!, cantNotas, tasaAciertos, elapsedTime);
+      String email = "user@example.com";
       String password = "securePassword";
       String userType = "Alumno";
       User currUser = setupUserForSave(currPracticaAsList, 1, email, password, userType);
 
       storeUser(currUser);
     }
+  }
+
+  void showEndDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Canción completada'),
+          content:
+            Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center, 
+                children: songId!=null ? <Widget>[Text("Tasa de aciertos ${aciertosSave}"), Text('¿Quieres repetir la canción o volver al menú principal?')]:<Widget>[Text('¿Quieres repetir la canción o volver al menú principal?')], 
+            ),
+            ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Repetir'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Logic to repeat the song
+                repeatSong();
+              },
+            ),
+            TextButton(
+              child: Text('Volver'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Logic to go back to the main menu
+                goToMainMenu();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void repeatSong() {
+    setState(() {
+      _buttonPressCount = 0;
+      _currentOffset = 0.0;
+      for (int i = 0; i < widget.notes.length; i++) {
+        if (i == 0) {
+          widget.notes[i] = Note(
+            pitch: widget.notes[i].pitch,
+            noteDuration: widget.notes[i].noteDuration,
+            color: Colors.blue,
+          );
+        } else {
+          widget.notes[i] = Note(
+            pitch: widget.notes[i].pitch,
+            noteDuration: widget.notes[i].noteDuration,
+            color: Colors.black,
+          );
+        }
+      }
+      isRecording.value = true;
+      start();
+    });
+  }
+
+  void goToMainMenu() {
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   @override
@@ -244,8 +318,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
                 Positioned(
                   top: 75, // Ajustar según necesidad
                   left: 139 +
-                      (widget.notes[0].buildNote(ClefType.treble).objectWidth / 2) *
-                          adjust, // Ajustar según necesidad
+                      (widget.notes[0].buildNote(ClefType.treble).objectWidth / 2) * adjust, // Ajustar según necesidad
                   child: Container(
                     width: 4, // Ancho de la línea vertical
                     height: 120, // Altura de la línea vertical
@@ -274,7 +347,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
                     return FloatingActionButton(
                       onPressed: () {
                         isRecording.value = false;
-                        stop();
+                        stop(false);
                       },
                       backgroundColor: Colors.red,
                       child: const Icon(Icons.adjust),
