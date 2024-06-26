@@ -14,7 +14,8 @@ class MusicSheetDisplayScreenPracticeMode extends StatefulWidget {
   final List<Note> notes;
   final int? songId;
 
-  MusicSheetDisplayScreenPracticeMode({Key? key, required this.notes, this.songId})
+  MusicSheetDisplayScreenPracticeMode(
+      {Key? key, required this.notes, this.songId})
       : super(key: key);
 
   @override
@@ -22,7 +23,8 @@ class MusicSheetDisplayScreenPracticeMode extends StatefulWidget {
       _MusicSheetDisplayScreenPracticeModeState();
 }
 
-class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayScreenPracticeMode> {
+class _MusicSheetDisplayScreenPracticeModeState
+    extends State<MusicSheetDisplayScreenPracticeMode> {
   double _currentOffset = 0.0;
   int _buttonPressCount = 0;
   double adjust = 30.025;
@@ -42,8 +44,8 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
   bool checkear_nota = true;
   int fallas = 0;
   double aciertosSave = 0.0;
- String sentimiento = "default";
- List<Note> displayNotes = [];
+  String sentimiento = "default";
+  List<Note> displayNotes = [];
 
   @override
   void initState() {
@@ -55,8 +57,8 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
 
     Timer(Duration(milliseconds: 2000), () {
       if (mounted) {
-          isRecording.value = true;
-          start();
+        isRecording.value = true;
+        start();
       }
     });
   }
@@ -76,7 +78,6 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
       });
     }
   }
-  
 
   Future<void> _checkPermission() async {
     if (!(await Permission.microphone.isGranted)) {
@@ -94,12 +95,14 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
   }
 
   void stop(bool showDialog) async {
-    fpad.stop();
+    if (fpad != null) {
+      fpad.stop();
+    }
     _stopwatch.stop();
-     if (showDialog) {
+    if (showDialog) {
       if (songId != null) {
-       await showDialogWithEmocionesCard().then((selectedSentimiento){
-          if(selectedSentimiento != null) {
+        await showDialogWithEmocionesCard().then((selectedSentimiento) {
+          if (selectedSentimiento != null) {
             updateSentimiento(selectedSentimiento);
           }
         });
@@ -108,6 +111,7 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
       showEndDialog();
     }
   }
+
   Future<String?> showDialogWithEmocionesCard() async {
     return showDialog<String>(
       context: context,
@@ -178,9 +182,10 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
   void _advanceSheet() {
     setState(() {
       if (_buttonPressCount < widget.notes.length) {
-        if(_buttonPressCount < widget.notes.length - 1)_currentOffset -= _calculateTotalWidth(_buttonPressCount);
+        if (_buttonPressCount < widget.notes.length - 1)
+          _currentOffset -= _calculateTotalWidth(_buttonPressCount);
 
-        if(_buttonPressCount == widget.notes.length - 1){
+        if (_buttonPressCount == widget.notes.length - 1) {
           if (isRecording.value == true) {
             tempNotes.clear();
             isRecording.value = false;
@@ -199,7 +204,6 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
         checkear_nota = false;
       } else {
         // Si se toca la última nota, detener la grabación
-        
       }
     });
   }
@@ -218,14 +222,17 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
   double _calculateTotalWidth(int count) {
     double width = 0.0;
     BuiltNote buildNote = widget.notes[count].buildNote(ClefType.treble);
-    BuiltNote buildNoteNext = widget.notes[count + 1].buildNote(ClefType.treble);
+    BuiltNote buildNoteNext =
+        widget.notes[count + 1].buildNote(ClefType.treble);
 
-    width += (buildNote.objectWidth / 2 + buildNoteNext.objectWidth / 2) * adjust;
+    width +=
+        (buildNote.objectWidth / 2 + buildNoteNext.objectWidth / 2) * adjust;
 
     return width;
   }
 
-  List<PracticaM> setupPracticaForSave(int songId, int cantAciertos, double tasaAciertos, int elapsedTime) {
+  List<PracticaM> setupPracticaForSave(
+      int songId, int cantAciertos, double tasaAciertos, int elapsedTime) {
     PracticaM practica = PracticaM(
       songId: songId,
       cantAciertos: cantAciertos,
@@ -239,7 +246,8 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
     return practicaList;
   }
 
-  User setupUserForSave(List<PracticaM> practica, int userId, String email, String password, String userType) {
+  User setupUserForSave(List<PracticaM> practica, int userId, String email,
+      String password, String userType) {
     User user = User(
       id: userId,
       email: email,
@@ -264,11 +272,13 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
       double tasaAciertos = getTasaAciertos();
       int elapsedTime = _stopwatch.elapsed.inSeconds;
 
-      List<PracticaM> currPracticaAsList = setupPracticaForSave(songId!, cantNotas, tasaAciertos, elapsedTime);
+      List<PracticaM> currPracticaAsList =
+          setupPracticaForSave(songId!, cantNotas, tasaAciertos, elapsedTime);
       String email = "user@example.com";
       String password = "securePassword";
       String userType = "Alumno";
-      User currUser = setupUserForSave(currPracticaAsList, 2, email, password, userType);
+      User currUser =
+          setupUserForSave(currPracticaAsList, 2, email, password, userType);
 
       storeUser(currUser);
     }
@@ -285,10 +295,15 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
               mainAxisAlignment: MainAxisAlignment.center,
               children: songId != null
                   ? <Widget>[
-                      Text("Tasa de aciertos ${aciertosSave} + Cantidad de notas ${widget.notes.length} + intentos ${fallas}"),
-                      Text('¿Quieres repetir la canción o volver al menú principal?')
+                      Text(
+                          "Tasa de aciertos ${aciertosSave} + Cantidad de notas ${widget.notes.length} + intentos ${fallas}"),
+                      Text(
+                          '¿Quieres repetir la canción o volver al menú principal?')
                     ]
-                  : <Widget>[Text('¿Quieres repetir la canción o volver al menú principal?')],
+                  : <Widget>[
+                      Text(
+                          '¿Quieres repetir la canción o volver al menú principal?')
+                    ],
             ),
           ),
           actions: <Widget>[
@@ -342,7 +357,8 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
                 ElevatedButton(
                   onPressed: () {
                     stop(false);
-                    Navigator.pushNamed(context, '/cancionesPrecargadas'); // Volver a canciones
+                    Navigator.pushNamed(
+                        context, '/cancionesPrecargadas'); // Volver a canciones
                   },
                   child: Text('Volver a Canciones'),
                 ),
@@ -381,9 +397,9 @@ class _MusicSheetDisplayScreenPracticeModeState extends State<MusicSheetDisplayS
                     top: 75, // Ajustar según necesidad
                     left: 139 +
                         (widget.notes[0]
-                                .buildNote(ClefType.treble)
-                                .objectWidth /
-                            2) *
+                                    .buildNote(ClefType.treble)
+                                    .objectWidth /
+                                2) *
                             adjust, // Ajustar según necesidad
                     child: Container(
                       width: 4, // Ancho de la línea vertical
