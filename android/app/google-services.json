@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:13807650100:android:cf4cd408cbdb4c64b8d161",
+        "android_client_info": {
+          "package_name": "com.example.t"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-Or9quPZa8pXKY8cq2NYeCzVjmnaPi8o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:13807650100:android:e54722753894eb40b8d161",
         "android_client_info": {
           "package_name": "com.example.test2"
@@ -29,6 +48,25 @@
         "mobilesdk_app_id": "1:13807650100:android:b48293f80787d902b8d161",
         "android_client_info": {
           "package_name": "com.fireandroid.pianocolors"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-Or9quPZa8pXKY8cq2NYeCzVjmnaPi8o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:13807650100:android:b159efd9d888bcbfb8d161",
+        "android_client_info": {
+          "package_name": "cpm.example.test2"
         }
       },
       "oauth_client": [],
