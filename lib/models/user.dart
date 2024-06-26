@@ -65,7 +65,19 @@ Future<void> storeUser(User user) async {
     }
 
     if (user.lecciones != null) {
-      existingLecciones.addAll(user.lecciones!.map((l) => l.toJson()));
+      for (var newLeccion in user.lecciones!) {
+        bool leccionExists = false;
+        for (int i = 0; i < existingLecciones.length; i++) {
+          if (existingLecciones[i]['leccion_id'] == newLeccion.leccionId) {
+            existingLecciones[i] = newLeccion.toJson();
+            leccionExists = true;
+            break;
+          }
+        }
+        if (!leccionExists) {
+          existingLecciones.add(newLeccion.toJson());
+        }
+      }
     }
 
     // Update the user document

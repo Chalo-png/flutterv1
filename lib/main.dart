@@ -75,11 +75,7 @@ class HomeScreen extends StatelessWidget {
               text: 'Lecciones',
               color: Colors.red[200]!,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const LeccionesScreen()),
-                );
+                Navigator.pushNamed(context, '/lecciones');
               },
             ),
             CustomButton(

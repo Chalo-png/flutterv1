@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class LeccionM {
   int leccionId;
   bool completed;
@@ -26,4 +28,6 @@ class LeccionM {
       sentimiento: json['sentimiento'],
     );
   }
+
+  
 }

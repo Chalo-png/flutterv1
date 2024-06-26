@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-
+import '../../models/leccionM.dart';
+import 'package:test2/models/user.dart';
 class Leccion1Screen extends StatelessWidget {
   const Leccion1Screen({super.key});
   @override
@@ -404,13 +405,43 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
       await audioPlayer2.play(AssetSource(assetPath));
     } 
   }
+  List<LeccionM> setupLeccion(int leccionId, bool completed, String sentimiento) {
+    LeccionM leccion = LeccionM(
+      leccionId: leccionId,
+      completed: completed,
+      sentimiento: sentimiento
+    );
+    List<LeccionM> leccionList = [];
+    leccionList.add(leccion);
+    return leccionList;
+  }
+  User setupLeccionforsave(List<LeccionM> lecciones, int userId, String email, String password, String userType) {
+    User user = User(
+      id: userId,
+      email: email,
+      password: password,
+      userType: userType,
+      lecciones: lecciones,
+    );
 
+    return user;
+  }
+
+  void _handlesave(){
+    List<LeccionM> currLeccion = setupLeccion(1,true,"happy");
+    String email =  "user@example.com";
+    String password = "securePassword";
+    String userType = "Alumno";
+    User currUser = setupLeccionforsave(currLeccion, 2, email, password, userType);
+    storeUser(currUser);
+  }
 
   @override
   void initState() {
     super.initState();
     audioPlayer.play(AssetSource('aplausos.mp3'));
     audioPlayer2.play(AssetSource('trompeta.mp3'));
+    _handlesave();
   }
 
   @override
@@ -418,10 +449,9 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
     audioPlayer.dispose(); // Liberar recursos del AudioPlayer
     super.dispose();
   }
-
+  
   @override
   Widget build(BuildContext context) {
-    final dynamic Function()? marcarLeccion1Completada = ModalRoute.of(context)!.settings.arguments as dynamic Function()?;
     return Scaffold(
       appBar: AppBar(
         title: const Text('¡Felicidades!'),
@@ -454,15 +484,14 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                marcarLeccion1Completada?.call();
-                Navigator.pushNamed(
-                context,
-                "/",
-                arguments: true,
-              );
+                Navigator.popUntil(
+                  context,
+                  ModalRoute.withName('/'),
+                );
               },
-              child: const Text('Volver a lecciones'),
+              child: const Text('Volver al Menú Principal'),
             ),
+
           ],
         ),
       ),
@@ -486,3 +515,13 @@ class Pictograma {
 
   Pictograma(this.titulo, this.sonido, this.imagen, this.animacion);
 }
+List<LeccionM> setupLeccion(int leccionId, bool completed, String sentimiento) {
+    LeccionM practica = LeccionM(
+      leccionId: leccionId,
+      completed: completed,
+      sentimiento: sentimiento,
+    );
+    List<LeccionM> practicaList = [];
+    practicaList.add(practica);
+    return practicaList;
+  }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../models/LeccionM.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LeccionesScreen extends StatefulWidget {
   const LeccionesScreen({super.key});
@@ -8,20 +10,58 @@ class LeccionesScreen extends StatefulWidget {
 }
 
 class LeccionesScreenState extends State<LeccionesScreen> {
-  late bool leccion1Completada;  bool leccion2Completada = false;
+  bool leccion1Completada = false;
+  bool leccion2Completada = false;
   bool leccion3Completada = false;
+  int userId = 2;
+  int leccionId = 1;
+
   @override
   void initState() {
     super.initState();
-    // Initialize any non-context dependent variables here
+    _fetchLeccion();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Access context-dependent variables here
-    leccion1Completada = ModalRoute.of(context)?.settings.arguments as bool? ?? false;
+  Future<void> _fetchLeccion() async {
+    LeccionM? leccion = await getLeccionByUserIdAndLeccionId(userId, leccionId);
+    if (leccion != null) {
+      // Do something with the fetched leccion
+      // For example, you might want to update the state
+      setState(() {
+        leccion1Completada = leccion.completed; // Update according to the fetched leccion
+      });
+    } else {
+      setState(() {
+        leccion1Completada = false;
+      });
+    }
   }
+
+  Future<LeccionM?> getLeccionByUserIdAndLeccionId(int userId, int leccionId) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final userDoc = firestore.collection('users').doc(userId.toString());
+
+    // Get the user document
+    final snapshot = await userDoc.get();
+
+    if (snapshot.exists) {
+      List<dynamic> lecciones = snapshot.data()?['lecciones'] ?? [];
+
+      // Ensure each element in lecciones is a Map before accessing 'leccion_id'
+      for (var leccionJson in lecciones) {
+        if (leccionJson is Map<String, dynamic>) {
+          if (leccionJson['leccion_id'] == leccionId) {
+            return LeccionM.fromJson(leccionJson);
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +79,7 @@ class LeccionesScreenState extends State<LeccionesScreen> {
               title: 'Lección 1 - Sonido y Silencio',
               description: 'Descubre el mundo de los sonidos y aprende a valorar el silencio.',
               icon: leccion1Completada ? Icons.star : Icons.star_border,
-              onTap: (){
+              onTap: () {
                 Navigator.pushNamed(context, '/leccion1');
               },
             ),
@@ -49,7 +89,7 @@ class LeccionesScreenState extends State<LeccionesScreen> {
               title: 'Lección 2 - Pentagrama',
               description: 'Explora el pentagrama y aprende a leer música.',
               icon: Icons.star_border,
-              onTap: (){
+              onTap: () {
                 Navigator.pushNamed(context, '/lecciones/leccion2', arguments: leccion1Completada);
               },
             ),
@@ -59,7 +99,7 @@ class LeccionesScreenState extends State<LeccionesScreen> {
               title: 'Lección 3 - Llave de Sol',
               description: 'Conoce la llave de sol y su importancia en la música.',
               icon: Icons.star_border,
-              onTap: (){
+              onTap: () {
                 Navigator.pushNamed(context, '/lecciones/leccion3');
               },
             ),
@@ -122,4 +162,3 @@ class CustomButton extends StatelessWidget {
     );
   }
 }
-
