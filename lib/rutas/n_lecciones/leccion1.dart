@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:test2/chatbot/chatbot_leccion1.dart';
 import '../../chatbot/emociones.dart';
 import '../../models/leccionM.dart';
 import 'package:test2/models/user.dart';
 import 'package:test2/chatbot/chatbot_emociones.dart';
-
+import "package:test2/chatbot/chatbot_tutorial.dart";
 class Leccion1Screen extends StatelessWidget {
   const Leccion1Screen({super.key});
   @override
@@ -117,13 +118,9 @@ class ModoTeoricoState extends State<ModoTeorico> {
       ),
       Expanded(
         child: Container(
-          padding: const EdgeInsets.only(left: 16.0), // Espacio para la imagen a la izquierda
+          padding: const EdgeInsets.only(left: 16.0), // Espacio a la izquierda
           alignment: Alignment.center,
-          child: Image.asset(
-            'assets/chatbot_gato.png', // Ruta de la imagen que quieres colocar a la izquierda
-            height: 100, // Ajusta el tamaño según sea necesario
-            width: 100,
-          ),
+          child: Chatbot_Leccion1(tipo: 0), // Instancia de la clase Chatbot_Tutorial
         ),
       ),
       ],
@@ -229,6 +226,10 @@ class ClasificacionScreen extends StatefulWidget {
 }
 
 class ClasificacionScreenState extends State<ClasificacionScreen> {
+  Chatbot_Leccion1 mibot = Chatbot_Leccion1(tipo: 1);
+  Chatbot_Leccion1 mibot2 = Chatbot_Leccion1(tipo: 2);
+  int equivocarse = 0;
+  int tipoChatbot = 1;
   List<ImagenClasificacion> imagenes = [
     ImagenClasificacion('vaca', 'vaca.png', true),
     ImagenClasificacion('dormir', 'dormir.png', false),
@@ -242,41 +243,42 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
   AudioPlayer audioPlayer = AudioPlayer();
   AudioPlayer audioPlayer2 = AudioPlayer();
 
-  @override
-  Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Clasificar Imágenes - Sonoras o Silenciosas'),
-      ),
-      body: Column(
-        children: [
-          Row(
+@override
+Widget build(BuildContext context) {
+  final screenHeight = MediaQuery.of(context).size.height;
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Clasificar Imágenes - Sonoras o Silenciosas'),
+    ),
+    body: Column(
+      children: [
+        Expanded(
+          child: Row(
             children: [
               Expanded(
                 child: DragTarget<ImagenClasificacion>(
                   builder: (context, candidateData, rejectedData) {
                     return Container(
-                        height: screenHeight / 2,
-                        color: Colors.blue.shade100,
-                        child: Wrap(
-                          alignment: WrapAlignment.center,
-                          children: [
-                            const SizedBox(
-                              width: double.infinity,
-                              child: Text(
-                                'Sonoras',
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign
-                                    .center, // Opcional, para centrar el texto dentro del Container
+                      height: screenHeight / 2,
+                      color: Colors.blue.shade100,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: double.infinity,
+                            child: Text(
+                              'Sonoras',
+                              style: TextStyle(
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.bold,
                               ),
+                              textAlign: TextAlign.center,
                             ),
-                            ...sonoras.map((e) => buildPictograma(e)),
-                          ],
-                        ));
+                          ),
+                          ...sonoras.map((e) => buildPictograma(e)),
+                        ],
+                      ),
+                    );
                   },
                   onAcceptWithDetails: (DragTargetDetails<dynamic> details) {
                     final data = details.data;
@@ -291,6 +293,14 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
                         });
                       } else {
                         reproducirSonido('equivocarse.mp3');
+                        equivocarse++;
+                        if (equivocarse == 3) {
+                          // Reiniciar el contador y cambiar el tipo del chatbot
+                          equivocarse = 0;
+                          setState(() {
+                            mibot = Chatbot_Leccion1(tipo: 2);
+                          });
+                        }
                       }
                       checkTermination(context);
                     });
@@ -301,26 +311,26 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
                 child: DragTarget<ImagenClasificacion>(
                   builder: (context, candidateData, rejectedData) {
                     return Container(
-                        height: screenHeight / 2,
-                        color: Colors.red.shade100,
-                        child: Wrap(
-                          alignment: WrapAlignment.center,
-                          children: [
-                            const SizedBox(
-                              width: double.infinity,
-                              child: Text(
-                                'Silenciosas',
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign
-                                    .center, // Opcional, para centrar el texto dentro del Container
+                      height: screenHeight / 2,
+                      color: Colors.red.shade100,
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: double.infinity,
+                            child: Text(
+                              'Silenciosas',
+                              style: TextStyle(
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.bold,
                               ),
+                              textAlign: TextAlign.center,
                             ),
-                            ...silenciosas.map((e) => buildPictograma(e)),
-                          ],
-                        ));
+                          ),
+                          ...silenciosas.map((e) => buildPictograma(e)),
+                        ],
+                      ),
+                    );
                   },
                   onAcceptWithDetails: (DragTargetDetails<dynamic> details) {
                     final data = details.data;
@@ -335,6 +345,15 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
                         });
                       } else {
                         reproducirSonido('equivocarse.mp3');
+                        equivocarse++;
+                        if (equivocarse == 3) {
+                          // Reiniciar el contador y cambiar el tipo del chatbot
+                          equivocarse = 0;
+                          setState(() {
+                            mibot = Chatbot_Leccion1(tipo: 2);
+                          });
+                          
+                        }
                       }
                       checkTermination(context);
                     });
@@ -342,50 +361,48 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
                 ),
               ),
               Expanded(
-        child: Container(
-          padding: const EdgeInsets.only(left: 16.0), // Espacio para la imagen a la izquierda
-          alignment: Alignment.center,
-          child: Image.asset(
-            'assets/chatbot_gato.png', // Ruta de la imagen que quieres colocar a la izquierda
-            height: 100, // Ajusta el tamaño según sea necesario
-            width: 100,
-          ),
-        ),
-      ),
+                flex: 1, // Ajusta el tamaño del espacio para el chatbot
+                child: Container(
+                  padding: const EdgeInsets.only(left: 16.0),
+                  alignment: Alignment.center,
+                  child: mibot,
+                ),
+              ),
             ],
           ),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.only(right: 16.0),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 200, // Ajusta este valor según tus necesidades
-                crossAxisSpacing: 16.0,
-                mainAxisSpacing: 16.0,
-              ),
-              itemCount: imagenes.length,
-              itemBuilder: (context, index) {
-                return Draggable<ImagenClasificacion>(
-                  data: imagenes[index],
-                  feedback: Material(
-                    child: Opacity(
-                      opacity: 0.7,
-                      child: buildPictograma(imagenes[index]),
-                    ),
-                  ),
-                  childWhenDragging: Container(),
-                  child: Card(
-                    elevation: 4.0,
-                    color: Colors.white,
+        ),
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.only(right: 16.0),
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 200,
+              crossAxisSpacing: 16.0,
+              mainAxisSpacing: 16.0,
+            ),
+            itemCount: imagenes.length,
+            itemBuilder: (context, index) {
+              return Draggable<ImagenClasificacion>(
+                data: imagenes[index],
+                feedback: Material(
+                  child: Opacity(
+                    opacity: 0.7,
                     child: buildPictograma(imagenes[index]),
                   ),
-                );
-              },
-            ),
+                ),
+                childWhenDragging: Container(),
+                child: Card(
+                  elevation: 4.0,
+                  color: Colors.white,
+                  child: buildPictograma(imagenes[index]),
+                ),
+              );
+            },
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   Widget buildPictograma(ImagenClasificacion imagenClasificacion) {
     return Container(
@@ -412,6 +429,8 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
     );
   }
 
+  // Función para cambiar el tipo del chatbot
+  
   Future reproducirSonido(String assetPath) async {
     if (audioPlayer.state != PlayerState.playing) {
       await audioPlayer.play(AssetSource(assetPath));
