@@ -8,6 +8,7 @@ import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:test2/models/user.dart';
 import 'chat_page.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class Chatbot extends StatefulWidget {
   @override
@@ -228,6 +229,7 @@ class _Chatbot extends State<Chatbot> {
     _buttonName2 = removeLeadingAsterisksAndSpaces(relatedTopics[1]);
     _buttonName3 = removeLeadingAsterisksAndSpaces(relatedTopics[2]);
     _buttonName4 = removeLeadingAsterisksAndSpaces(relatedTopics[3]);
+    getRelatedIcons(relatedTopics);
   }
 
   /// Handles the button press event for the Reformular button.
@@ -244,6 +246,7 @@ class _Chatbot extends State<Chatbot> {
     _buttonName2 = removeLeadingAsterisksAndSpaces(relatedTopics[1]);
     _buttonName3 = removeLeadingAsterisksAndSpaces(relatedTopics[2]);
     _buttonName4 = removeLeadingAsterisksAndSpaces(relatedTopics[3]);
+    getRelatedIcons(relatedTopics);
   }
 
   /// Handles the button press event for the Relacionado button.
@@ -260,6 +263,7 @@ class _Chatbot extends State<Chatbot> {
     _buttonName2 = removeLeadingAsterisksAndSpaces(relatedTopics[1]);
     _buttonName3 = removeLeadingAsterisksAndSpaces(relatedTopics[2]);
     _buttonName4 = removeLeadingAsterisksAndSpaces(relatedTopics[3]);
+    getRelatedIcons(relatedTopics);
   }
 
   /// Handles the button press event for the Preguntar button.
@@ -279,6 +283,7 @@ class _Chatbot extends State<Chatbot> {
     _buttonName2 = removeLeadingAsterisksAndSpaces(relatedTopics[1]);
     _buttonName3 = removeLeadingAsterisksAndSpaces(relatedTopics[2]);
     _buttonName4 = removeLeadingAsterisksAndSpaces(relatedTopics[3]);
+    getRelatedIcons(relatedTopics);
   }
 
   /// Handles the button press event for the Pizza button.
@@ -396,13 +401,57 @@ class _Chatbot extends State<Chatbot> {
     _buttonName2 = removeLeadingAsterisksAndSpaces(relatedTopics[1]);
     _buttonName3 = removeLeadingAsterisksAndSpaces(relatedTopics[2]);
     _buttonName4 = removeLeadingAsterisksAndSpaces(relatedTopics[3]);
+    getRelatedIcons(relatedTopics);
     return res;
   }
 
-  final IconData iconExplicacion = Icons.info;
-  final IconData iconReformular = Icons.autorenew;
-  final IconData iconTemasRelacionados = Icons.add;
-  final IconData iconPreguntar = Icons.help;
+  IconData iconExplicacion = Icons.info;
+  IconData iconReformular = Icons.autorenew;
+  IconData iconTemasRelacionados = Icons.add;
+  IconData iconPreguntar = Icons.help;
+  IconData iconChatbot = Icons.chat;
+
+  Future<void> getRelatedIcons(List<String> topics) async {
+    String text = topics[0] + topics[1] + topics[2] + topics[3];
+    String getRelatedIconsText =
+        'Eres un recomendador de iconos para flutter. Estos debe ser capaces de guardarse en la variable tipo IconData. Solo debes responder con el texto de por ejemplo: Icons.music_note, Icons.home,etc. Solo debes sugerir iconos presentes en material design. El formato de entrada es * Respuesta1 * Respuesta2 * Respuesta3 *  Respuesta4 y el formato de salida es Salida1 * Salida2 * Salida3 * Salida4. \nEntrada : ' +
+            text;
+    List<String> relatedIcons = [];
+    List<Map<String, dynamic>> messagesHistory = [
+      Messages(role: Role.user, content: getRelatedIconsText).toJson()
+    ];
+    final request = ChatCompleteText(
+      messages: messagesHistory,
+      maxToken: 200,
+      model: GptTurboChatModel(),
+    );
+    final response = await _openAI.onChatCompletion(request: request);
+    for (var element in response!.choices) {
+      if (element.message != null) {
+        setState(() {
+          _messages.insert(
+            0,
+            ChatMessage(
+              user: _gptChatUser,
+              createdAt: DateTime.now(),
+              text: element.message!.content,
+            ),
+          );
+        });
+        print(element.message!.content);
+        relatedIcons = getMatches(element.message!.content, RegExp(r"\*[^*]+"));
+      }
+    }
+    print(relatedIcons);
+    if (relatedIcons.isNotEmpty) {
+      iconExplicacion = MdiIcons.fromString(relatedIcons[0].split('.').last)!;
+      iconReformular = MdiIcons.fromString(relatedIcons[1].split('.').last)!;
+      iconTemasRelacionados =
+          MdiIcons.fromString(relatedIcons[2].split('.').last)!;
+
+      iconPreguntar = MdiIcons.fromString(relatedIcons[3].split('.').last)!;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -466,7 +515,7 @@ class _Chatbot extends State<Chatbot> {
                           AnimatedCard(
                             isVisible: isVisibleMenu,
                             text: "Preguntar por texto",
-                            icon: iconPreguntar,
+                            icon: iconChatbot,
                             onTap: () {
                               // presiono_preguntar();
                               Navigator.push(
