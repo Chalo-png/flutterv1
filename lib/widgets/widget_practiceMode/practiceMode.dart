@@ -147,6 +147,7 @@ class _MusicSheetDisplayScreenPracticeModeState
         if (shouldAdvance()) {
           _advanceSheet();
         } else {
+          checkear_nota = false;
           tempNotes.clear();
           fallas++;
         }
@@ -247,13 +248,14 @@ class _MusicSheetDisplayScreenPracticeModeState
   }
 
   User setupUserForSave(List<PracticaM> practica, int userId, String email,
-      String password, String userType) {
+      String password, String userType, int edad) {
     User user = User(
       id: userId,
       email: email,
       password: password,
       userType: userType,
-      practicas: practica, // Optional practica object
+      practicas: practica,
+      edad: edad, // Optional practica object
     );
 
     return user;
@@ -277,8 +279,9 @@ class _MusicSheetDisplayScreenPracticeModeState
       String email = "user@example.com";
       String password = "securePassword";
       String userType = "Alumno";
-      User currUser =
-          setupUserForSave(currPracticaAsList, 2, email, password, userType);
+      int edad = 5;
+      User currUser = setupUserForSave(
+          currPracticaAsList, 2, email, password, userType, edad);
 
       storeUser(currUser);
     }

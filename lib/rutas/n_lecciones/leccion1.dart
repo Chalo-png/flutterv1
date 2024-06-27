@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../../models/leccionM.dart';
 import 'package:test2/models/user.dart';
+
 class Leccion1Screen extends StatelessWidget {
   const Leccion1Screen({super.key});
   @override
   Widget build(BuildContext context) {
-  
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lección 1 - Sonido y Silencio'),
       ),
-      body: const ModoTeorico(), // Mostrar el modo teórico al inicio de la lección
+      body:
+          const ModoTeorico(), // Mostrar el modo teórico al inicio de la lección
     );
   }
 }
@@ -56,7 +57,8 @@ class ModoTeoricoState extends State<ModoTeorico> {
 
   @override
   void dispose() {
-    audioPlayer.dispose(); // Libera los recursos del AudioPlayer al cerrar la pantalla
+    audioPlayer
+        .dispose(); // Libera los recursos del AudioPlayer al cerrar la pantalla
     super.dispose();
   }
 
@@ -78,7 +80,6 @@ class ModoTeoricoState extends State<ModoTeorico> {
             });
             reproducirSonido(index);
             mostrarAnimacion(context, index);
-            
           },
           child: Card(
             color: tocado[index] ? Colors.green : Colors.white,
@@ -86,7 +87,11 @@ class ModoTeoricoState extends State<ModoTeorico> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset('assets/${pictogramas[index].imagen}',height: 100,width: 100,),
+                Image.asset(
+                  'assets/${pictogramas[index].imagen}',
+                  height: 100,
+                  width: 100,
+                ),
                 const SizedBox(height: 8.0),
                 Text(
                   pictogramas[index].titulo,
@@ -125,12 +130,13 @@ class ModoTeoricoState extends State<ModoTeorico> {
         ),
       ).then((value) {
         if (tocado.every((element) => element)) {
-              Future.delayed(const Duration(seconds: 1), () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FelicidadesScreen()),
-              );
-            });
+          Future.delayed(const Duration(seconds: 1), () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const FelicidadesScreen()),
+            );
+          });
         }
       });
     }
@@ -182,7 +188,8 @@ class FelicidadesScreenState extends State<FelicidadesScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ClasificacionScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const ClasificacionScreen()),
                 );
               },
               child: const Text('Continuar'),
@@ -213,7 +220,7 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
   List<ImagenClasificacion> silenciosas = [];
   AudioPlayer audioPlayer = AudioPlayer();
   AudioPlayer audioPlayer2 = AudioPlayer();
-  
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -229,25 +236,26 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
                 child: DragTarget<ImagenClasificacion>(
                   builder: (context, candidateData, rejectedData) {
                     return Container(
-                      height: screenHeight/2,
-                      color: Colors.blue.shade100,
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: double.infinity,
-                            child: Text(
-                              'Sonoras',
-                              style: TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.bold,
+                        height: screenHeight / 2,
+                        color: Colors.blue.shade100,
+                        child: Wrap(
+                          alignment: WrapAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                'Sonoras',
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign
+                                    .center, // Opcional, para centrar el texto dentro del Container
                               ),
-                              textAlign: TextAlign.center, // Opcional, para centrar el texto dentro del Container
                             ),
-                          ),
-                          ...sonoras.map((e) => buildPictograma(e)),
-                        ],
-                      ));
+                            ...sonoras.map((e) => buildPictograma(e)),
+                          ],
+                        ));
                   },
                   onAcceptWithDetails: (DragTargetDetails<dynamic> details) {
                     final data = details.data;
@@ -272,25 +280,26 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
                 child: DragTarget<ImagenClasificacion>(
                   builder: (context, candidateData, rejectedData) {
                     return Container(
-                      height: screenHeight/2,
-                      color: Colors.red.shade100,
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: double.infinity,
-                            child: Text(
-                              'Silenciosas',
-                              style: TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.bold,
+                        height: screenHeight / 2,
+                        color: Colors.red.shade100,
+                        child: Wrap(
+                          alignment: WrapAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                'Silenciosas',
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign
+                                    .center, // Opcional, para centrar el texto dentro del Container
                               ),
-                              textAlign: TextAlign.center, // Opcional, para centrar el texto dentro del Container
                             ),
-                          ),
-                          ...silenciosas.map((e) => buildPictograma(e)),
-                        ],
-                      ));
+                            ...silenciosas.map((e) => buildPictograma(e)),
+                          ],
+                        ));
                   },
                   onAcceptWithDetails: (DragTargetDetails<dynamic> details) {
                     final data = details.data;
@@ -347,35 +356,37 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
   }
 
   Widget buildPictograma(ImagenClasificacion imagenClasificacion) {
-  return Container(
-    color: Colors.white, // Fondo blanco
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset('assets/${imagenClasificacion.imagen}', height: 100, width: 100,),
-        const SizedBox(height: 4.0),
-        Text(
-          imagenClasificacion.titulo,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 8.0,
-            fontWeight: FontWeight.bold,
+    return Container(
+      color: Colors.white, // Fondo blanco
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'assets/${imagenClasificacion.imagen}',
+            height: 100,
+            width: 100,
           ),
-        ),
-      ],
-    ),
-  );
-}
-
+          const SizedBox(height: 4.0),
+          Text(
+            imagenClasificacion.titulo,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 8.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Future reproducirSonido(String assetPath) async {
-    if(audioPlayer.state!= PlayerState.playing){
+    if (audioPlayer.state != PlayerState.playing) {
       await audioPlayer.play(AssetSource(assetPath));
-    }else{
+    } else {
       await audioPlayer2.play(AssetSource(assetPath));
     }
-  
-}
+  }
 
   void checkTermination(BuildContext context) {
     Future.delayed(const Duration(seconds: 1));
@@ -386,8 +397,8 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
       );
     }
   }
-
 }
+
 class FelicidadesFinalScreen extends StatefulWidget {
   const FelicidadesFinalScreen({super.key});
   @override
@@ -399,40 +410,44 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
   AudioPlayer audioPlayer2 = AudioPlayer();
 
   void reproducirSonido(String assetPath) async {
-    if(audioPlayer.state!= PlayerState.playing){
+    if (audioPlayer.state != PlayerState.playing) {
       await audioPlayer.play(AssetSource(assetPath));
-    }else{
+    } else {
       await audioPlayer2.play(AssetSource(assetPath));
-    } 
+    }
   }
-  List<LeccionM> setupLeccion(int leccionId, bool completed, String sentimiento) {
+
+  List<LeccionM> setupLeccion(
+      int leccionId, bool completed, String sentimiento) {
     LeccionM leccion = LeccionM(
-      leccionId: leccionId,
-      completed: completed,
-      sentimiento: sentimiento
-    );
+        leccionId: leccionId, completed: completed, sentimiento: sentimiento);
     List<LeccionM> leccionList = [];
     leccionList.add(leccion);
     return leccionList;
   }
-  User setupLeccionforsave(List<LeccionM> lecciones, int userId, String email, String password, String userType) {
+
+  User setupLeccionforsave(List<LeccionM> lecciones, int userId, String email,
+      String password, String userType, int edad) {
     User user = User(
       id: userId,
       email: email,
       password: password,
       userType: userType,
+      edad: edad,
       lecciones: lecciones,
     );
 
     return user;
   }
 
-  void _handlesave(){
-    List<LeccionM> currLeccion = setupLeccion(1,true,"happy");
-    String email =  "user@example.com";
+  void _handlesave() {
+    List<LeccionM> currLeccion = setupLeccion(1, true, "happy");
+    String email = "user@example.com";
     String password = "securePassword";
     String userType = "Alumno";
-    User currUser = setupLeccionforsave(currLeccion, 2, email, password, userType);
+    int edad = 5;
+    User currUser =
+        setupLeccionforsave(currLeccion, 2, email, password, userType, edad);
     storeUser(currUser);
   }
 
@@ -449,7 +464,7 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
     audioPlayer.dispose(); // Liberar recursos del AudioPlayer
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -491,7 +506,6 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
               },
               child: const Text('Volver al Menú Principal'),
             ),
-
           ],
         ),
       ),
@@ -515,13 +529,14 @@ class Pictograma {
 
   Pictograma(this.titulo, this.sonido, this.imagen, this.animacion);
 }
+
 List<LeccionM> setupLeccion(int leccionId, bool completed, String sentimiento) {
-    LeccionM practica = LeccionM(
-      leccionId: leccionId,
-      completed: completed,
-      sentimiento: sentimiento,
-    );
-    List<LeccionM> practicaList = [];
-    practicaList.add(practica);
-    return practicaList;
-  }
+  LeccionM practica = LeccionM(
+    leccionId: leccionId,
+    completed: completed,
+    sentimiento: sentimiento,
+  );
+  List<LeccionM> practicaList = [];
+  practicaList.add(practica);
+  return practicaList;
+}
