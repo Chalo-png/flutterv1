@@ -6,8 +6,8 @@ import 'package:test2/rutas/cancionesPrecargadas.dart';
 import 'package:test2/rutas/n_lecciones/leccion1.dart';
 import 'package:test2/rutas/generar.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'chatbot/chatbot.dart';
 import 'firebase_options.dart';
+import 'package:test2/chatbot/chatbot.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +32,6 @@ class MyApp extends StatelessWidget {
         '/': (context) => const HomeScreen(),
         '/lecciones': (context) => const LeccionesScreen(),
         '/leccion1': (context) => const Leccion1Screen(),
-        '/asistente': (context) => Chatbot(),
       },
     );
   }
@@ -47,66 +46,49 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Flutter Piano App'),
       ),
-      body: Stack(
+      body: Center(
+          child: Row(
         children: [
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CustomButton(
-                  text: 'Practica',
-                  color: Colors.yellow,
-                  onTap: () {
-                    Navigator.pushNamed(context, '/cancionesPrecargadas');
-                  },
-                ),
-                CustomButton(
-                  text: 'Genera melodia',
-                  color: Colors.red[200]!,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => GeneratorDisplayScreen()),
-                    );
-                  },
-                ),
-                CustomButton(
-                  text: 'Lecciones',
-                  color: Colors.red[200]!,
-                  onTap: () {
-                    Navigator.pushNamed(context, '/lecciones');
-                  },
-                ),
-                CustomButton(
-                  text: 'Minijuegos',
-                  color: Colors.blue[200]!,
-                  onTap: () {
-                    // Navigate to Minijuegos Screen
-                  },
-                ),
-                CustomButton(
-                  text: 'Asistente',
-                  color: Color.fromARGB(255, 214, 50, 126)!,
-                  onTap: () {
-                    // Navigate to Minijuegos Screen
-                    Navigator.pushNamed(context, '/asistente');
-                  },
-                ),
-              ],
-            ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CustomButton(
+                text: 'Practica',
+                color: Colors.yellow,
+                onTap: () {
+                  Navigator.pushNamed(context, '/cancionesPrecargadas');
+                },
+              ),
+              CustomButton(
+                text: 'Genera melodia',
+                color: Colors.red[200]!,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => GeneratorDisplayScreen()),
+                  );
+                },
+              ),
+              CustomButton(
+                text: 'Lecciones',
+                color: Colors.red[200]!,
+                onTap: () {
+                  Navigator.pushNamed(context, '/lecciones');
+                },
+              ),
+              CustomButton(
+                text: 'Minijuegos',
+                color: Colors.blue[200]!,
+                onTap: () {
+                  // Navigate to Minijuegos Screen
+                },
+              ),
+            ],
           ),
-          Positioned(
-            bottom: 10,
-            right: 20,
-            child: SizedBox(
-              width: 50,
-              height: 50,
-              child: Chatbot(),
-            ),
-          ),
+          Chatbot(),
         ],
-      ),
+      )),
     );
   }
 }

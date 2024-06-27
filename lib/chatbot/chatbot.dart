@@ -7,6 +7,7 @@ import 'consts.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:test2/models/user.dart';
 import 'chat_page.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 class Chatbot extends StatefulWidget {
   @override
@@ -19,6 +20,7 @@ class _Chatbot extends State<Chatbot> {
   bool isChatPageVisible = false;
   bool isFirstTime = true;
   String userName = "Alonso";
+  int _IndexTalk = 0;
   int userId = 0;
   int? age;
   String _buttonName1 = "Explicación";
@@ -26,6 +28,35 @@ class _Chatbot extends State<Chatbot> {
   String _buttonName3 = "Relacionado";
   String _buttonName4 = "Preguntar";
   String? contextText;
+  final FlutterTts _flutterTts = FlutterTts();
+
+  Map? _currentVoice;
+
+  void initTTS() {
+    _flutterTts.getVoices.then((data) {
+      try {
+        List<Map> voices = List<Map>.from(data);
+        try {
+          _flutterTts.setSpeechRate(2.0);
+        } catch (e) {
+          print(e);
+        }
+        print(voices);
+        voices = voices.where((voice) => voice["name"].contains("es")).toList();
+        setState(() {
+          _currentVoice = voices.first;
+          setVoice(_currentVoice!);
+        });
+      } catch (e) {
+        print(e);
+      }
+    });
+  }
+
+  void setVoice(Map voice) {
+    _flutterTts.setVoice({"name": voice["name"], "locale": voice["locale"]});
+  }
+
   final _openAI = OpenAI.instance.build(
     token: OPENAI_API_KEY,
     baseOption: HttpSetup(
@@ -51,9 +82,10 @@ class _Chatbot extends State<Chatbot> {
   @override
   void initState() {
     super.initState();
-    contextText =
-        'Eres el asistente una aplicación llamada Piano Colors, que se enfoca en la enseñanza de piano a niños con síndrome de Down. Recuerda ajustar tu respuesta de modo que ellos lo entiendan, son niños con capacidades diferentes y tus respuestas deben ser siempre afirmaciones. El usuario actual se llama $userName, de $age años de edad. Recuerda ajustar tu respuestar tomando en cuenta la edad del usuario y el hecho de que tiene Sindrome de Down. RECUERDA AJUSTAR TU RESPUESTA SEGUN LA EDAD DEL USUARIO Y NO REPITAS TUS RESPUESTAS';
     getEdad(userId);
+    contextText =
+        'Eres el asistente una aplicación llamada Piano Colors, que se enfoca en la enseñanza de piano a niños con síndrome de Down. Recuerda ajustar tu respuesta de modo que ellos lo entiendan, son niños con capacidades diferentes y tus respuestas deben ser siempre afirmaciones. El usuario actual se llama $userName, de $age años de edad. Recuerda ajustar tu respuestar tomando en cuenta la edad del usuario y el hecho de que tiene Sindrome de Down. RECUERDA AJUSTAR TU RESPUESTA SEGUN LA EDAD DEL USUARIO Y NO REPITAS TUS RESPUESTAS. Menciona la edad del usuario en tu respuesta';
+    print(contextText);
     _fetchEdad();
   }
 
@@ -82,10 +114,29 @@ class _Chatbot extends State<Chatbot> {
 
   int currentIndex = 0;
   Timer? timer;
+  bool shouldContinue = true;
+  Completer<void> completer = Completer<void>();
+
+  int indice = 0;
+
+  List<String> Guia = [
+    'Bienvenido a Piano Color!\n Con nosotros podras aprender conceptos de musica y tocar divertidas canciones',
+    'El modo practica permite escoger una cancion con distintas dificultases, para que puedas ensayar',
+    'El modo Generar Melodia permite generar fragmentos musicales para que tengas mas para practicar',
+    'El modo Leccion tiene distintos enseñansas y ejercicios asociados',
+    'El modo Minijuego tiene distintos juegos para que puedas divertirte',
+    'Espero que disfrute y aprendas con Piano Colors'
+  ];
+  void presiono_guia() {
+    MostrarTexto(Guia[1]);
+  }
 
   /// Shows the text character by character with a delay.
   void MostrarTexto(String text) async {
     String greetingResponse;
+    _flutterTts.setSpeechRate(0.1);
+
+    int localIndex = 0;
     if (isFirstTime) {
       greetingResponse = await sendUserGreeting();
       isFirstTime = false;
@@ -93,16 +144,29 @@ class _Chatbot extends State<Chatbot> {
       greetingResponse = await askQuestion(text);
     }
     _lastMessages.add(greetingResponse);
+    _flutterTts.speak(greetingResponse);
     timer = Timer.periodic(Duration(milliseconds: delayMilliseconds),
         (timer) async {
-      if (currentIndex < greetingResponse.length) {
+      if (shouldContinue && localIndex < greetingResponse.length) {
         setState(() {
-          textoMostrado = greetingResponse.substring(0, currentIndex + 1);
+          textoMostrado = greetingResponse.substring(0, localIndex + 1);
           print(textoMostrado);
-          currentIndex++;
+          if (greetingResponse.substring(localIndex, localIndex + 1) == " ") {
+            _IndexTalk = 0;
+          } else {
+            _IndexTalk = 1;
+          }
+          localIndex++;
         });
       } else {
         timer.cancel();
+        setState(() {
+          _IndexTalk = 0;
+        });
+        completer.complete();
+      }
+      if (shouldContinue && localIndex == greetingResponse.length) {
+        indice = indice + 1;
       }
     });
   }
@@ -233,7 +297,7 @@ class _Chatbot extends State<Chatbot> {
   Future<List<String>> getRelatedTopics() async {
     String previousGptResponse = _lastMessages.last;
     String getRelatedTopicsText =
-        'Sugiere 4 temas relacionados a tu respuesta anterior. La respuesta anterior fue la siguiente:' +
+        'Sugiere 4 temas relacionados a tu respuesta anterior. Tu respuesta no debe tener mas de cinco palabras. La respuesta anterior fue la siguiente:' +
             previousGptResponse +
             ' \n Tu respuesta debe seguir el siguiente formato: * Respuesta 1 * Respuesta 2 * Respuesta 3 * Respuesta 4';
     List<String> relatedTopics = [];
@@ -310,7 +374,7 @@ class _Chatbot extends State<Chatbot> {
     });
     String questionPrompt = "\n Respuesta anterior de ChatGPT:" +
         _lastMessages.last +
-        "\n Pregunta: " +
+        "\n No comiences tu respuesta saludando al usuario, ya lo hiciste cuando ingreso a la aplicacion. Pregunta: Como " +
         m;
     List<Map<String, dynamic>> messagesHistory = [
       Messages(role: Role.user, content: contextText! + questionPrompt).toJson()
@@ -342,162 +406,166 @@ class _Chatbot extends State<Chatbot> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: Row(
-                children: <Widget>[
-                  Padding(
+    return Center(
+      child: Row(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(
+              left: MediaQuery.of(context).orientation == Orientation.portrait
+                  ? 0.0
+                  : 70.0,
+              top: MediaQuery.of(context).orientation == Orientation.portrait
+                  ? 300.0
+                  : 70.0,
+              right: 0.0,
+              bottom: MediaQuery.of(context).orientation == Orientation.portrait
+                  ? 0.0
+                  : 10.0,
+            ),
+            child: IndexedStack(
+              index: _currentIndex,
+              children: <Widget>[
+                Container(
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          AnimatedCard(
+                            isVisible: isVisibleMenu,
+                            text: _buttonName1,
+                            icon: iconExplicacion,
+                            onTap: presiono_info,
+                          ),
+                          AnimatedCard(
+                            isVisible: isVisibleMenu,
+                            text: _buttonName2,
+                            icon: iconReformular,
+                            onTap: presiono_reformular,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          AnimatedCard(
+                            isVisible: isVisibleMenu,
+                            text: _buttonName3,
+                            icon: iconTemasRelacionados,
+                            onTap: presiono_relacionado,
+                          ),
+                          AnimatedCard(
+                            isVisible: isVisibleMenu,
+                            text: _buttonName4,
+                            icon: iconPreguntar,
+                            onTap: presiono_preguntar,
+                            // presiono_preguntar();
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          AnimatedCard(
+                            isVisible: isVisibleMenu,
+                            text: "Preguntar por texto",
+                            icon: iconPreguntar,
+                            onTap: () {
+                              // presiono_preguntar();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ChatPage(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  child: Padding(
                     padding: EdgeInsets.only(
                       left: MediaQuery.of(context).orientation ==
                               Orientation.portrait
                           ? 0.0
-                          : 70.0,
+                          : 0.0,
                       top: MediaQuery.of(context).orientation ==
                               Orientation.portrait
-                          ? 300.0
-                          : 70.0,
+                          ? 0.0
+                          : 0.0,
                       right: 0.0,
                       bottom: MediaQuery.of(context).orientation ==
                               Orientation.portrait
-                          ? 0.0
+                          ? 300.0
                           : 10.0,
                     ),
-                    child: IndexedStack(
-                      index: _currentIndex,
-                      children: <Widget>[
-                        Container(
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  AnimatedCard(
-                                    isVisible: isVisibleMenu,
-                                    text: _buttonName1,
-                                    icon: iconExplicacion,
-                                    onTap: presiono_info,
-                                  ),
-                                  AnimatedCard(
-                                    isVisible: isVisibleMenu,
-                                    text: _buttonName2,
-                                    icon: iconReformular,
-                                    onTap: presiono_reformular,
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: <Widget>[
-                                  AnimatedCard(
-                                    isVisible: isVisibleMenu,
-                                    text: _buttonName3,
-                                    icon: iconTemasRelacionados,
-                                    onTap: presiono_relacionado,
-                                  ),
-                                  AnimatedCard(
-                                    isVisible: isVisibleMenu,
-                                    text: _buttonName4,
-                                    icon: iconPreguntar,
-                                    onTap: () {
-                                      // presiono_preguntar();
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const ChatPage(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
+                    child: GestureDetector(
+                      onTap: isVisibleChat ? presiono_pizza : null,
+                      child: AnimatedOpacity(
+                        duration: Duration(milliseconds: 500),
+                        opacity: isVisibleChat ? 1.0 : 0.0,
+                        child: Container(
+                          width: 350,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 10,
+                                offset: Offset(2, 2),
                               ),
                             ],
                           ),
-                        ),
-                        Container(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              left: MediaQuery.of(context).orientation ==
-                                      Orientation.portrait
-                                  ? 0.0
-                                  : 0.0,
-                              top: MediaQuery.of(context).orientation ==
-                                      Orientation.portrait
-                                  ? 0.0
-                                  : 0.0,
-                              right: 0.0,
-                              bottom: MediaQuery.of(context).orientation ==
-                                      Orientation.portrait
-                                  ? 300.0
-                                  : 10.0,
-                            ),
-                            child: GestureDetector(
-                              onTap: isVisibleChat ? presiono_pizza : null,
-                              child: AnimatedOpacity(
-                                duration: Duration(milliseconds: 500),
-                                opacity: isVisibleChat ? 1.0 : 0.0,
-                                child: Container(
-                                  width: 350,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 10,
-                                        offset: Offset(2, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: SingleChildScrollView(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 20.0, horizontal: 10.0),
-                                      physics: BouncingScrollPhysics(),
-                                      child: Text(
-                                        textoMostrado,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: 24.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                          child: Center(
+                            child: SingleChildScrollView(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 20.0, horizontal: 10.0),
+                              physics: BouncingScrollPhysics(),
+                              child: Text(
+                                textoMostrado,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
                                 ),
                               ),
                             ),
                           ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        left: 0.0,
-                        top: 0.0,
-                        right: 0.0,
-                        bottom: MediaQuery.of(context).orientation ==
-                                Orientation.portrait
-                            ? 0.0
-                            : 10.0,
-                      ),
-                      child: GestureDetector(
-                        onTap: isVisibleChat ? null : presiono_chatbot,
-                        child: Image.asset(
-                          'assets/chatbot_gato.png',
                         ),
                       ),
                     ),
                   ),
-                ],
+                )
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(
+              left: 10.0,
+              bottom: MediaQuery.of(context).orientation == Orientation.portrait
+                  ? 0.0
+                  : 10.0,
+            ),
+            child: GestureDetector(
+              onTap: isVisibleChat ? null : presiono_chatbot,
+              child: Container(
+                child: IndexedStack(
+                  index: _IndexTalk,
+                  children: [
+                    Image.asset(
+                      'assets/chatbot_camaleon_color_final.png',
+                    ),
+                    Image.asset(
+                      'assets/chatbot_camaleon_color_habla_final.png',
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

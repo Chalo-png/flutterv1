@@ -17,7 +17,7 @@ class EmocionesCard extends StatefulWidget {
 class _EmocionesCard extends State<EmocionesCard> {
   bool isVisible = true;
   final IconData frustracion = Icons.sentiment_very_dissatisfied;
-  final IconData tristesa = Icons.sentiment_dissatisfied_outlined;
+  final IconData tristeza = Icons.sentiment_dissatisfied_outlined;
   final IconData neutro = Icons.sentiment_neutral;
   final IconData contento = Icons.sentiment_satisfied_outlined;
   final IconData emocionado = Icons.sentiment_very_satisfied_rounded;
@@ -119,8 +119,8 @@ class _EmocionesCard extends State<EmocionesCard> {
                                 AnimatedCard(
                                   isVisible: isVisible,
                                   text: '',
-                                  icon: tristesa,
-                                  onTap: () => presiono_emoji('tristesa'),
+                                  icon: tristeza,
+                                  onTap: () => presiono_emoji('tristeza'),
                                 ),
                                 AnimatedCard(
                                   isVisible: isVisible,
