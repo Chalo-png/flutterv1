@@ -5,7 +5,7 @@ import 'package:test2/widgets/widget_musicSheet/MusicSheetWidget.dart';
 import 'package:test2/widgets/widget_musicSheet/simple_sheet_music.dart';
 import 'package:test2/widgets/widget_musicSheet/src/music_objects/note/note.dart';
 import 'package:flutter_piano_audio_detection/flutter_piano_audio_detection.dart';
-import 'package:permission_handler/permission_handler.dart';
+
 import "package:test2/chatbot/emociones.dart";
 
 import '../../models/practicaM.dart';
@@ -56,10 +56,10 @@ class _MusicSheetDisplayScreenPracticeModeState
   @override
   void initState() {
     super.initState();
-    _checkPermission();
+    
     fpad.prepare();
     tempNotes.clear();
-    addNotesToSheet(Duration(milliseconds: 0));
+    addNotesToSheet(Duration(milliseconds: 300));
 
     Timer(Duration(milliseconds: 2000), () {
       if (mounted) {
@@ -85,14 +85,7 @@ class _MusicSheetDisplayScreenPracticeModeState
     }
   }
 
-  Future<void> _checkPermission() async {
-    if (!(await Permission.microphone.isGranted)) {
-      var status = await Permission.microphone.request();
-      if (status != PermissionStatus.granted) {
-        // Permiso denegado, puedes mostrar un mensaje o tomar otra acción
-      }
-    }
-  }
+  
 
   void start() {
     tempNotes.clear();
