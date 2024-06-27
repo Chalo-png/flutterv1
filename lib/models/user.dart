@@ -8,6 +8,7 @@ class User {
   final String email;
   final String password;
   final String userType;
+  final int edad;
   final List<PracticaM>? practicas;
   final List<LeccionM>? lecciones;
 
@@ -16,6 +17,7 @@ class User {
     required this.email,
     required this.password,
     required this.userType,
+    required this.edad,
     this.practicas,
     this.lecciones,
   });
@@ -26,6 +28,7 @@ class User {
       'email': email,
       'password': password,
       'userType': userType,
+      'edad': edad,
       'practicas': practicas?.map((p) => p.toJson()).toList(),
       'lecciones': lecciones?.map((l) => l.toJson()).toList(),
     };
@@ -37,6 +40,7 @@ class User {
       email: json['email'],
       password: json['password'],
       userType: json['userType'],
+      edad: json['edad'],
       practicas: (json['practicas'] as List<dynamic>?)
           ?.map((p) => PracticaM.fromJson(p))
           .toList(),
@@ -84,9 +88,26 @@ Future<void> storeUser(User user) async {
     await userDoc.update({
       'practicas': existingPracticas,
       'lecciones': existingLecciones,
+      'edad': user.edad,
     });
   } else {
     // If user does not exist, create a new document
     await userDoc.set(user.toJson());
+  }
+}
+
+Future<int?> getUserEdadById(int userId) async {
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final userDoc = firestore.collection('users').doc(userId.toString());
+
+  // Get the user data
+  final snapshot = await userDoc.get();
+
+  if (snapshot.exists) {
+    return snapshot.data()?['edad'];
+  } else {
+    // Handle the case when the user does not exist
+    print('User with id $userId does not exist');
+    return null;
   }
 }

@@ -58,124 +58,64 @@ final List<Note> runRunNotas = [
 
 final List<Note> testSong = [
   const Note(
-      pitch: Pitch.e4,
-      noteDuration: NoteDuration.whole,
+    pitch: Pitch.c4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.oneHundredsTwentyEighth
+    pitch: Pitch.d4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.d4,
-      noteDuration: NoteDuration.quarter
+    pitch: Pitch.e4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.b4,
-      noteDuration: NoteDuration.quarter
+    pitch: Pitch.f4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.g4,
-      noteDuration: NoteDuration.whole
+    pitch: Pitch.g4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.d4,
-      noteDuration: NoteDuration.whole
+    pitch: Pitch.a4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.quarter
+    pitch: Pitch.b4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.a4,
-      noteDuration: NoteDuration.half
+    pitch: Pitch.c5,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.half
+    pitch: Pitch.b4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.a4,
-      noteDuration: NoteDuration.quarter
+    pitch: Pitch.a4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.quarter
+    pitch: Pitch.g4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.d4,
-      noteDuration: NoteDuration.quarter
+    pitch: Pitch.f4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.b4,
-      noteDuration: NoteDuration.quarter
+    pitch: Pitch.e4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.e4,
-      noteDuration: NoteDuration.quarter
+    pitch: Pitch.d4,
+    noteDuration: NoteDuration.quarter,
   ),
   const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.d4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.b4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.g4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.d4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.half
-  ),
-  const Note(
-      pitch: Pitch.a4,
-      noteDuration: NoteDuration.sixteenth
-  ),
-  const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.eighth
-  ),
-  const Note(
-      pitch: Pitch.a4,
-      noteDuration: NoteDuration.whole
-  ),
-  const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.a4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.a4,
-      noteDuration: NoteDuration.sixteenth
-  ),
-  const Note(
-      pitch: Pitch.a4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.a4,
-      noteDuration: NoteDuration.whole
-  ),
-  const Note(
-      pitch: Pitch.a4,
-      noteDuration: NoteDuration.whole
-  ),
-  const Note(
-      pitch: Pitch.a4,
-      noteDuration: NoteDuration.quarter
+    pitch: Pitch.c4,
+    noteDuration: NoteDuration.quarter,
   ),
 ];
 

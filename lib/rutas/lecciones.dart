@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/LeccionM.dart';
+import '../models/leccionM.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LeccionesScreen extends StatefulWidget {
@@ -28,7 +28,8 @@ class LeccionesScreenState extends State<LeccionesScreen> {
       // Do something with the fetched leccion
       // For example, you might want to update the state
       setState(() {
-        leccion1Completada = leccion.completed; // Update according to the fetched leccion
+        leccion1Completada =
+            leccion.completed; // Update according to the fetched leccion
       });
     } else {
       setState(() {
@@ -37,7 +38,8 @@ class LeccionesScreenState extends State<LeccionesScreen> {
     }
   }
 
-  Future<LeccionM?> getLeccionByUserIdAndLeccionId(int userId, int leccionId) async {
+  Future<LeccionM?> getLeccionByUserIdAndLeccionId(
+      int userId, int leccionId) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     final userDoc = firestore.collection('users').doc(userId.toString());
 
@@ -59,9 +61,6 @@ class LeccionesScreenState extends State<LeccionesScreen> {
     return null;
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,7 +76,8 @@ class LeccionesScreenState extends State<LeccionesScreen> {
             CustomButton(
               color: Colors.red,
               title: 'Lección 1 - Sonido y Silencio',
-              description: 'Descubre el mundo de los sonidos y aprende a valorar el silencio.',
+              description:
+                  'Descubre el mundo de los sonidos y aprende a valorar el silencio.',
               icon: leccion1Completada ? Icons.star : Icons.star_border,
               onTap: () {
                 Navigator.pushNamed(context, '/leccion1');
@@ -90,14 +90,16 @@ class LeccionesScreenState extends State<LeccionesScreen> {
               description: 'Explora el pentagrama y aprende a leer música.',
               icon: Icons.star_border,
               onTap: () {
-                Navigator.pushNamed(context, '/lecciones/leccion2', arguments: leccion1Completada);
+                Navigator.pushNamed(context, '/lecciones/leccion2',
+                    arguments: leccion1Completada);
               },
             ),
             const SizedBox(height: 16.0),
             CustomButton(
               color: Colors.yellow,
               title: 'Lección 3 - Llave de Sol',
-              description: 'Conoce la llave de sol y su importancia en la música.',
+              description:
+                  'Conoce la llave de sol y su importancia en la música.',
               icon: Icons.star_border,
               onTap: () {
                 Navigator.pushNamed(context, '/lecciones/leccion3');
@@ -136,7 +138,8 @@ class CustomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(15.0),
         ),
         child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
           title: Text(
             title,
             style: const TextStyle(
