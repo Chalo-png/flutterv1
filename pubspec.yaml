@@ -49,6 +49,7 @@ dependencies:
   cloud_firestore: ^5.0.1
   chat_gpt_sdk: ^3.0.9
   dash_chat_2: ^0.0.21
+  flutter_tts: ^3.2.2
 
 dev_dependencies:
   flutter_test:
