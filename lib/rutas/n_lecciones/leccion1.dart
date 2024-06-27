@@ -65,49 +65,68 @@ class ModoTeoricoState extends State<ModoTeorico> {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(16.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16.0,
-        mainAxisSpacing: 16.0,
-      ),
-      itemCount: pictogramas.length,
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              tocado[index] = true; // Marcar la tarjeta como tocada
-            });
-            reproducirSonido(index);
-            mostrarAnimacion(context, index);
-          },
-          child: Card(
-            color: tocado[index] ? Colors.green : Colors.white,
-            elevation: 4.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/${pictogramas[index].imagen}',
-                  height: 100,
-                  width: 100,
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                  pictogramas[index].titulo,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Expanded(
+          flex: 3,
+          child: GridView.builder(
+          padding: const EdgeInsets.all(16.0),
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200, // Ajusta este valor según tus necesidades
+            crossAxisSpacing: 16.0,
+            mainAxisSpacing: 16.0,
           ),
-        );
-      },
-    );
+          itemCount: pictogramas.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  tocado[index] = true; // Marcar la tarjeta como tocada
+                });
+                reproducirSonido(index);
+                mostrarAnimacion(context, index);
+              },
+              child: Card(
+                color: tocado[index] ? Colors.green : Colors.white,
+                elevation: 4.0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/${pictogramas[index].imagen}',
+                      height: 100,
+                      width: 100,
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                      pictogramas[index].titulo,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        )
+      ),
+      Expanded(
+        child: Container(
+          padding: const EdgeInsets.only(left: 16.0), // Espacio para la imagen a la izquierda
+          alignment: Alignment.center,
+          child: Image.asset(
+            'assets/chatbot_gato.png', // Ruta de la imagen que quieres colocar a la izquierda
+            height: 100, // Ajusta el tamaño según sea necesario
+            width: 100,
+          ),
+        ),
+      ),
+      ],
+    );      
   }
 
   // Método para reproducir el sonido correspondiente al pictograma
@@ -321,13 +340,24 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
                   },
                 ),
               ),
+              Expanded(
+        child: Container(
+          padding: const EdgeInsets.only(left: 16.0), // Espacio para la imagen a la izquierda
+          alignment: Alignment.center,
+          child: Image.asset(
+            'assets/chatbot_gato.png', // Ruta de la imagen que quieres colocar a la izquierda
+            height: 100, // Ajusta el tamaño según sea necesario
+            width: 100,
+          ),
+        ),
+      ),
             ],
           ),
           Expanded(
             child: GridView.builder(
-              padding: const EdgeInsets.all(16.0),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
+              padding: const EdgeInsets.only(right: 16.0),
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 200, // Ajusta este valor según tus necesidades
                 crossAxisSpacing: 16.0,
                 mainAxisSpacing: 16.0,
               ),
