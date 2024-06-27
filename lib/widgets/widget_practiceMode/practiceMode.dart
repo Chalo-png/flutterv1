@@ -5,7 +5,7 @@ import 'package:test2/widgets/widget_musicSheet/MusicSheetWidget.dart';
 import 'package:test2/widgets/widget_musicSheet/simple_sheet_music.dart';
 import 'package:test2/widgets/widget_musicSheet/src/music_objects/note/note.dart';
 import 'package:flutter_piano_audio_detection/flutter_piano_audio_detection.dart';
-import 'package:permission_handler/permission_handler.dart';
+
 import "package:test2/chatbot/emociones.dart";
 
 import '../../models/practicaM.dart';
@@ -39,7 +39,13 @@ class _MusicSheetDisplayScreenPracticeModeState
   List<String> realtimeNotes = [];
   List<String> tempNotes = [];
   String printText = "";
+
   Timer? _timer;
+  static const int TIMER_RAPIDO = 500;
+  static const int TIMER_NORMAL = 2000;
+  static const int TIMER_LENTO = 5000;
+  // Variable para la duración actual del timer
+  int currentTimerDuration = TIMER_NORMAL;
   Stopwatch _stopwatch = Stopwatch();
   bool checkear_nota = true;
   int fallas = 0;
@@ -51,7 +57,7 @@ class _MusicSheetDisplayScreenPracticeModeState
   @override
   void initState() {
     super.initState();
-    _checkPermission();
+    
     fpad.prepare();
     tempNotes.clear();
     addNotesToSheet(Duration(milliseconds: 300));
@@ -84,16 +90,10 @@ class _MusicSheetDisplayScreenPracticeModeState
     }
   }
 
-  Future<void> _checkPermission() async {
-    if (!(await Permission.microphone.isGranted)) {
-      var status = await Permission.microphone.request();
-      if (status != PermissionStatus.granted) {
-        // Permiso denegado, puedes mostrar un mensaje o tomar otra acción
-      }
-    }
-  }
+  
 
   void start() {
+    tempNotes.clear();
     fpad.start();
     _stopwatch.start();
     getResult();
@@ -162,6 +162,22 @@ class _MusicSheetDisplayScreenPracticeModeState
       
     });
   }
+  // Método para cambiar la velocidad del timer
+  void _changeSpeed(String speed) {
+    setState(() {
+      switch (speed) {
+        case 'Rápido':
+          currentTimerDuration = TIMER_RAPIDO;
+          break;
+        case 'Normal':
+          currentTimerDuration = TIMER_NORMAL;
+          break;
+        case 'Lento':
+          currentTimerDuration = TIMER_LENTO;
+          break;
+      }
+    });
+  }
 
   void _updateTempNotes(List<String> updatedNotes) {
     // Añadir solo las notas que no estén ya en tempNotes
@@ -172,7 +188,7 @@ class _MusicSheetDisplayScreenPracticeModeState
     }
 
     if (_timer == null || !_timer!.isActive) {
-      _timer = Timer(Duration(milliseconds: 2000), () {
+      _timer = Timer(Duration(milliseconds: currentTimerDuration), () {
         checkear_nota = true;
         realtimeNotes = List.from(tempNotes);
         tempNotes.clear();
@@ -351,7 +367,6 @@ class _MusicSheetDisplayScreenPracticeModeState
 
   void goToMainMenu() {
     tempNotes.clear();
-    stop(true);
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
@@ -359,7 +374,6 @@ class _MusicSheetDisplayScreenPracticeModeState
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        // Mostrar un diálogo o realizar alguna acción personalizada
         bool shouldPop = await showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -370,15 +384,13 @@ class _MusicSheetDisplayScreenPracticeModeState
                 ElevatedButton(
                   onPressed: () {
                     stop(false);
-                    Navigator.pushNamed(
-                        context, '/cancionesPrecargadas'); // Volver a canciones
+                    Navigator.pushNamed(context, '/cancionesPrecargadas');
                   },
                   child: Text('Volver a Canciones'),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    // Logic to repeat the song
                     repeatSong();
                   },
                   child: Text('Repetir Canción'),
@@ -388,9 +400,7 @@ class _MusicSheetDisplayScreenPracticeModeState
           ),
         );
 
-        // Si shouldPop es null, significa que se cerró el diálogo sin elegir ninguna opción
-        // Devuelve false para evitar que Flutter maneje el pop
-        return shouldPop != null;
+        return shouldPop;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -401,26 +411,43 @@ class _MusicSheetDisplayScreenPracticeModeState
             Expanded(
               child: Stack(
                 children: [
-                  // Ajusta según tu implementación de MusicSheetWidgetAux
                   Positioned(
                     left: _currentOffset,
                     child: MusicSheetWidgetAux(notes: displayNotes),
                   ),
                   Positioned(
-                    top: 75, // Ajustar según necesidad
+                    top: 75,
                     left: 139 +
-                        (widget.notes[0]
-                                    .buildNote(ClefType.treble)
-                                    .objectWidth /
-                                2) *
-                            adjust, // Ajustar según necesidad
+                        (widget.notes[0].buildNote(ClefType.treble).objectWidth / 2) * adjust,
                     child: Container(
-                      width: 4, // Ancho de la línea vertical
-                      height: 120, // Altura de la línea vertical
-                      color: Colors.blueGrey, // Color de la línea vertical
+                      width: 4,
+                      height: 120,
+                      color: Colors.blueGrey,
                     ),
                   ),
                 ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: DropdownButton<String>(
+                value: currentTimerDuration == TIMER_RAPIDO
+                    ? 'Rápido'
+                    : currentTimerDuration == TIMER_NORMAL
+                        ? 'Normal'
+                        : 'Lento',
+                items: <String>['Rápido', 'Normal', 'Lento']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    _changeSpeed(newValue);
+                  }
+                },
               ),
             ),
             Padding(
@@ -452,7 +479,6 @@ class _MusicSheetDisplayScreenPracticeModeState
                 ),
               ),
             ),
-            // Botón flotante temporal para avanzar la partitura manualmente
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: FloatingActionButton(

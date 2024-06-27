@@ -8,6 +8,7 @@ import 'package:test2/rutas/generar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'chatbot/chatbot.dart';
 import 'firebase_options.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,8 +19,19 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    _checkPermission();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +47,15 @@ class MyApp extends StatelessWidget {
         '/asistente': (context) => Chatbot(),
       },
     );
+  }
+}
+
+Future<void> _checkPermission() async {
+  if (!(await Permission.microphone.isGranted)) {
+    var status = await Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      // Permiso denegado, puedes mostrar un mensaje o tomar otra acción
+    }
   }
 }
 
@@ -87,7 +108,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 CustomButton(
                   text: 'Asistente',
-                  color: Color.fromARGB(255, 214, 50, 126)!,
+                  color: const Color.fromARGB(255, 214, 50, 126)!,
                   onTap: () {
                     // Navigate to Minijuegos Screen
                     Navigator.pushNamed(context, '/asistente');
@@ -117,10 +138,7 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const CustomButton(
-      {super.key,
-      required this.text,
-      required this.color,
-      required this.onTap});
+      {super.key, required this.text, required this.color, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

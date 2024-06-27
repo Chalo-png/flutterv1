@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import '../../chatbot/emociones.dart';
 import '../../models/leccionM.dart';
 import 'package:test2/models/user.dart';
 
@@ -408,6 +409,7 @@ class FelicidadesFinalScreen extends StatefulWidget {
 class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
   AudioPlayer audioPlayer = AudioPlayer();
   AudioPlayer audioPlayer2 = AudioPlayer();
+  String sentimiento = "default";
 
   void reproducirSonido(String assetPath) async {
     if (audioPlayer.state != PlayerState.playing) {
@@ -417,10 +419,12 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
     }
   }
 
-  List<LeccionM> setupLeccion(
-      int leccionId, bool completed, String sentimiento) {
+  List<LeccionM> setupLeccion(int leccionId, bool completed, String sentimiento) {
     LeccionM leccion = LeccionM(
-        leccionId: leccionId, completed: completed, sentimiento: sentimiento);
+        leccionId: leccionId,
+        completed: completed,
+        sentimiento: sentimiento);
+
     List<LeccionM> leccionList = [];
     leccionList.add(leccion);
     return leccionList;
@@ -439,15 +443,44 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
 
     return user;
   }
+  void updateSentimiento(String newSentimiento) {
+    setState(() {
+      sentimiento = newSentimiento;
+    });
+  }
+  Future<String?> showDialogWithEmocionesCard() async {
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: EmocionesCard(
+            TipoActividad: "practice",
+            onSentimientoSelected: (sentimiento) {
+              Navigator.of(context).pop(sentimiento);
+            },
+          ),
+        );
+      },
+    );
+  }
+  Future<void> setupSentimientoInLeccion() async {
+    await showDialogWithEmocionesCard().then((selectedSentimiento) {
+      if (selectedSentimiento != null) {
+        updateSentimiento(selectedSentimiento);
+      }
+    });
+  }
 
-  void _handlesave() {
-    List<LeccionM> currLeccion = setupLeccion(1, true, "happy");
+
+  Future<void> _handleSave() async {
+    await setupSentimientoInLeccion();
+    List<LeccionM> currLeccion = setupLeccion(1, true, sentimiento);
     String email = "user@example.com";
     String password = "securePassword";
     String userType = "Alumno";
     int edad = 5;
     User currUser =
-        setupLeccionforsave(currLeccion, 2, email, password, userType, edad);
+    setupLeccionforsave(currLeccion, 2, email, password, userType, edad);
     storeUser(currUser);
   }
 
@@ -456,7 +489,9 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
     super.initState();
     audioPlayer.play(AssetSource('aplausos.mp3'));
     audioPlayer2.play(AssetSource('trompeta.mp3'));
-    _handlesave();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _handleSave();
+    });
   }
 
   @override
@@ -530,13 +565,3 @@ class Pictograma {
   Pictograma(this.titulo, this.sonido, this.imagen, this.animacion);
 }
 
-List<LeccionM> setupLeccion(int leccionId, bool completed, String sentimiento) {
-  LeccionM practica = LeccionM(
-    leccionId: leccionId,
-    completed: completed,
-    sentimiento: sentimiento,
-  );
-  List<LeccionM> practicaList = [];
-  practicaList.add(practica);
-  return practicaList;
-}
