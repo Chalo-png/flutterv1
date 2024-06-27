@@ -13,6 +13,23 @@ final List<Note> estrellitaNotas = [
   // Más notas
 ];
 
+final List<Note> testSong2 = [
+  const Note(
+      pitch: Pitch.e4,
+      noteDuration: NoteDuration.quarter
+  ),
+  const Note(
+      pitch: Pitch.c4,
+      noteDuration: NoteDuration.quarter
+  ),
+  const Note(
+      pitch: Pitch.e4,
+      noteDuration: NoteDuration.quarter
+  ),
+  // Más notas
+];
+
+
 final List<Note> runRunNotas = [
   const Note(
       pitch: Pitch.e4,
@@ -163,6 +180,7 @@ class _CancionesPrecargadasState extends State<CancionesPrecargadas> {
     Cancion(id:3, titulo: 'Memories', genero: 'Infantil', dificultad: 2, duracion: '3 m 40 s', notas: memoriesNotas),
     Cancion(id:4, titulo: 'Drive by', genero: 'Soul', dificultad: 3, duracion: '3 m', notas: driveByNotas),
     Cancion(id:5, titulo: 'Test Song', genero: 'Test', dificultad: 5, duracion: '2 m', notas: testSong),
+    Cancion(id:5, titulo: 'Test Song2', genero: 'Test', dificultad: 5, duracion: '2 m', notas: testSong2),
   ];
 
   @override

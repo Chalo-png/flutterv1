@@ -46,6 +46,7 @@ class _MusicSheetDisplayScreenPracticeModeState
   double aciertosSave = 0.0;
   String sentimiento = "default";
   List<Note> displayNotes = [];
+  bool initialWait = false;
 
   @override
   void initState() {
@@ -53,12 +54,16 @@ class _MusicSheetDisplayScreenPracticeModeState
     _checkPermission();
     fpad.prepare();
     tempNotes.clear();
-    addNotesToSheet(Duration(milliseconds: 0));
+    addNotesToSheet(Duration(milliseconds: 300));
 
-    Timer(Duration(milliseconds: 2000), () {
+    isRecording.value = true;
+    start();
+
+    Timer(Duration(milliseconds: 3000), () {
       if (mounted) {
-        isRecording.value = true;
-        start();
+        print("Inicio partitura");
+        tempNotes.clear();
+        initialWait = true;
       }
     });
   }
@@ -142,16 +147,19 @@ class _MusicSheetDisplayScreenPracticeModeState
       // Actualiza tempNotes sin setState
       _updateTempNotes(updatedNotes);
 
-      if (checkear_nota && tempNotes.isNotEmpty) {
-        print(tempNotes);
-        if (shouldAdvance()) {
-          _advanceSheet();
-        } else {
-          checkear_nota = false;
-          tempNotes.clear();
-          fallas++;
+      if(initialWait){
+        if (checkear_nota && tempNotes.isNotEmpty) {
+          print(tempNotes);
+          if (shouldAdvance()) {
+            _advanceSheet();
+          } else {
+            checkear_nota = false;
+            tempNotes.clear();
+            fallas++;
+          }
         }
       }
+      
     });
   }
 
@@ -342,6 +350,8 @@ class _MusicSheetDisplayScreenPracticeModeState
   }
 
   void goToMainMenu() {
+    tempNotes.clear();
+    stop(true);
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
