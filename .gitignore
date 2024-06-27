@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/release
 /android/app/src/main/assets/
 #onsets_frames_wavinput.tflite
+/firebase.json
+/lib/firebase_options.dart
+/android/app/google-services.json
