@@ -78,7 +78,7 @@ class _EmocionesCard extends State<EmocionesCard> {
                               vertical: 20.0, horizontal: 10.0),
                           physics: BouncingScrollPhysics(),
                           child: Text(
-                            "Como te sentiste con esta " + widget.TipoActividad,
+                            "¿Como te sentiste con esta " + widget.TipoActividad,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 20.0,
