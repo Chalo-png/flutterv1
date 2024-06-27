@@ -155,6 +155,7 @@ class _MusicSheetDisplayScreenPracticeModeState
           } else {
             checkear_nota = false;
             tempNotes.clear();
+            changeNoteColorToRed(_buttonPressCount);
             fallas++;
           }
         }
@@ -370,127 +371,121 @@ class _MusicSheetDisplayScreenPracticeModeState
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        bool shouldPop = await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('¿Qué deseas hacer?'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    stop(false);
-                    Navigator.pushNamed(context, '/cancionesPrecargadas');
-                  },
-                  child: Text('Volver a Canciones'),
+  void changeNoteColorToRed(int index) {
+  setState(() {
+    displayNotes[index] = Note(
+      pitch: widget.notes[index].pitch,
+      noteDuration: widget.notes[index].noteDuration,
+      color: Colors.red,
+    );
+  });
+
+  // Retrasar la restauración del color a negro si no es azul
+  if (displayNotes[index].color != Colors.blue) {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        if (displayNotes[index].color != Colors.blue) {
+          displayNotes[index] = Note(
+            pitch: widget.notes[index].pitch,
+            noteDuration: widget.notes[index].noteDuration,
+            color: Colors.black,
+          );
+        }
+      });
+    });
+  }
+}
+
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Modo práctica'),
+    ),
+    body: Column(
+      children: <Widget>[
+        Expanded(
+          child: Stack(
+            children: [
+              Positioned(
+                left: _currentOffset,
+                child: MusicSheetWidgetAux(notes: displayNotes),
+              ),
+              Positioned(
+                top: 75,
+                left: 139 + (widget.notes[0].buildNote(ClefType.treble).objectWidth / 2) * adjust,
+                child: Container(
+                  width: 4,
+                  height: 120,
+                  color: Colors.blueGrey,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    repeatSong();
-                  },
-                  child: Text('Repetir Canción'),
-                ),
-              ],
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: DropdownButton<String>(
+            value: currentTimerDuration == TIMER_RAPIDO
+                ? 'Rápido'
+                : currentTimerDuration == TIMER_NORMAL
+                    ? 'Normal'
+                    : 'Lento',
+            items: <String>['Rápido', 'Normal', 'Lento']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                _changeSpeed(newValue);
+              }
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            child: ValueListenableBuilder(
+              valueListenable: isRecording,
+              builder: (context, value, widget) {
+                if (value == false) {
+                  return FloatingActionButton(
+                    onPressed: () {
+                      isRecording.value = true;
+                      start();
+                    },
+                    backgroundColor: Colors.blue,
+                    child: const Icon(Icons.mic),
+                  );
+                } else {
+                  return FloatingActionButton(
+                    onPressed: () {
+                      isRecording.value = false;
+                      stop(false);
+                    },
+                    backgroundColor: Colors.red,
+                    child: const Icon(Icons.adjust),
+                  );
+                }
+              },
             ),
           ),
-        );
-
-        return shouldPop;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Modo práctica'),
         ),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: _currentOffset,
-                    child: MusicSheetWidgetAux(notes: displayNotes),
-                  ),
-                  Positioned(
-                    top: 75,
-                    left: 139 +
-                        (widget.notes[0].buildNote(ClefType.treble).objectWidth / 2) * adjust,
-                    child: Container(
-                      width: 4,
-                      height: 120,
-                      color: Colors.blueGrey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: DropdownButton<String>(
-                value: currentTimerDuration == TIMER_RAPIDO
-                    ? 'Rápido'
-                    : currentTimerDuration == TIMER_NORMAL
-                        ? 'Normal'
-                        : 'Lento',
-                items: <String>['Rápido', 'Normal', 'Lento']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    _changeSpeed(newValue);
-                  }
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                child: ValueListenableBuilder(
-                  valueListenable: isRecording,
-                  builder: (context, value, widget) {
-                    if (value == false) {
-                      return FloatingActionButton(
-                        onPressed: () {
-                          isRecording.value = true;
-                          start();
-                        },
-                        backgroundColor: Colors.blue,
-                        child: const Icon(Icons.mic),
-                      );
-                    } else {
-                      return FloatingActionButton(
-                        onPressed: () {
-                          isRecording.value = false;
-                          stop(false);
-                        },
-                        backgroundColor: Colors.red,
-                        child: const Icon(Icons.adjust),
-                      );
-                    }
-                  },
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FloatingActionButton(
-                onPressed: _advanceSheet,
-                child: Icon(Icons.arrow_forward),
-              ),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FloatingActionButton(
+            onPressed: _advanceSheet,
+            child: Icon(Icons.arrow_forward),
+          ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
 }
 
 class MusicSheetWidgetAux extends StatelessWidget {
