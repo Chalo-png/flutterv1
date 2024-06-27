@@ -7,7 +7,6 @@ import 'package:test2/rutas/n_lecciones/leccion1.dart';
 import 'package:test2/rutas/generar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:test2/chatbot/chatbot.dart';
 
 void main() async {
@@ -19,19 +18,8 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-    _checkPermission();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,15 +37,6 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-Future<void> _checkPermission() async {
-  if (!(await Permission.microphone.isGranted)) {
-    var status = await Permission.microphone.request();
-    if (status != PermissionStatus.granted) {
-      // Permiso denegado, puedes mostrar un mensaje o tomar otra acción
-    }
-  }
-}
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -68,6 +47,8 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Flutter Piano App'),
       ),
       body: Center(
+          child: Row(
+        children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
