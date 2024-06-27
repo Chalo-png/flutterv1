@@ -5,7 +5,7 @@ import 'package:test2/widgets/widget_musicSheet/MusicSheetWidget.dart';
 import 'package:test2/widgets/widget_musicSheet/simple_sheet_music.dart';
 import 'package:test2/widgets/widget_musicSheet/src/music_objects/note/note.dart';
 import 'package:flutter_piano_audio_detection/flutter_piano_audio_detection.dart';
-import 'package:permission_handler/permission_handler.dart';
+
 import "package:test2/chatbot/emociones.dart";
 
 import '../../models/practicaM.dart';
@@ -39,26 +39,37 @@ class _MusicSheetDisplayScreenPracticeModeState
   List<String> realtimeNotes = [];
   List<String> tempNotes = [];
   String printText = "";
+
   Timer? _timer;
+  static const int TIMER_RAPIDO = 500;
+  static const int TIMER_NORMAL = 2000;
+  static const int TIMER_LENTO = 5000;
+  // Variable para la duración actual del timer
+  int currentTimerDuration = TIMER_NORMAL;
   Stopwatch _stopwatch = Stopwatch();
   bool checkear_nota = true;
   int fallas = 0;
   double aciertosSave = 0.0;
   String sentimiento = "default";
   List<Note> displayNotes = [];
+  bool initialWait = false;
 
   @override
   void initState() {
     super.initState();
-    _checkPermission();
+    
     fpad.prepare();
     tempNotes.clear();
-    addNotesToSheet(Duration(milliseconds: 0));
+    addNotesToSheet(Duration(milliseconds: 300));
 
-    Timer(Duration(milliseconds: 2000), () {
+    isRecording.value = true;
+    start();
+
+    Timer(Duration(milliseconds: 3000), () {
       if (mounted) {
-        isRecording.value = true;
-        start();
+        print("Inicio partitura");
+        tempNotes.clear();
+        initialWait = true;
       }
     });
   }
@@ -79,16 +90,10 @@ class _MusicSheetDisplayScreenPracticeModeState
     }
   }
 
-  Future<void> _checkPermission() async {
-    if (!(await Permission.microphone.isGranted)) {
-      var status = await Permission.microphone.request();
-      if (status != PermissionStatus.granted) {
-        // Permiso denegado, puedes mostrar un mensaje o tomar otra acción
-      }
-    }
-  }
+  
 
   void start() {
+    tempNotes.clear();
     fpad.start();
     _stopwatch.start();
     getResult();
@@ -142,15 +147,35 @@ class _MusicSheetDisplayScreenPracticeModeState
       // Actualiza tempNotes sin setState
       _updateTempNotes(updatedNotes);
 
-      if (checkear_nota && tempNotes.isNotEmpty) {
-        print(tempNotes);
-        if (shouldAdvance()) {
-          _advanceSheet();
-        } else {
-          checkear_nota = false;
-          tempNotes.clear();
-          fallas++;
+      if(initialWait){
+        if (checkear_nota && tempNotes.isNotEmpty) {
+          print(tempNotes);
+          if (shouldAdvance()) {
+            _advanceSheet();
+          } else {
+            checkear_nota = false;
+            tempNotes.clear();
+            changeNoteColorToRed(_buttonPressCount);
+            fallas++;
+          }
         }
+      }
+      
+    });
+  }
+  // Método para cambiar la velocidad del timer
+  void _changeSpeed(String speed) {
+    setState(() {
+      switch (speed) {
+        case 'Rápido':
+          currentTimerDuration = TIMER_RAPIDO;
+          break;
+        case 'Normal':
+          currentTimerDuration = TIMER_NORMAL;
+          break;
+        case 'Lento':
+          currentTimerDuration = TIMER_LENTO;
+          break;
       }
     });
   }
@@ -164,7 +189,7 @@ class _MusicSheetDisplayScreenPracticeModeState
     }
 
     if (_timer == null || !_timer!.isActive) {
-      _timer = Timer(Duration(milliseconds: 2000), () {
+      _timer = Timer(Duration(milliseconds: currentTimerDuration), () {
         checkear_nota = true;
         realtimeNotes = List.from(tempNotes);
         tempNotes.clear();
@@ -342,119 +367,125 @@ class _MusicSheetDisplayScreenPracticeModeState
   }
 
   void goToMainMenu() {
+    tempNotes.clear();
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // Mostrar un diálogo o realizar alguna acción personalizada
-        bool shouldPop = await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('¿Qué deseas hacer?'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    stop(false);
-                    Navigator.pushNamed(
-                        context, '/cancionesPrecargadas'); // Volver a canciones
-                  },
-                  child: Text('Volver a Canciones'),
+  void changeNoteColorToRed(int index) {
+  setState(() {
+    displayNotes[index] = Note(
+      pitch: widget.notes[index].pitch,
+      noteDuration: widget.notes[index].noteDuration,
+      color: Colors.red,
+    );
+  });
+
+  // Retrasar la restauración del color a negro si no es azul
+  if (displayNotes[index].color != Colors.blue) {
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        if (displayNotes[index].color != Colors.blue) {
+          displayNotes[index] = Note(
+            pitch: widget.notes[index].pitch,
+            noteDuration: widget.notes[index].noteDuration,
+            color: Colors.black,
+          );
+        }
+      });
+    });
+  }
+}
+
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Modo práctica'),
+    ),
+    body: Column(
+      children: <Widget>[
+        Expanded(
+          child: Stack(
+            children: [
+              Positioned(
+                left: _currentOffset,
+                child: MusicSheetWidgetAux(notes: displayNotes),
+              ),
+              Positioned(
+                top: 75,
+                left: 139 + (widget.notes[0].buildNote(ClefType.treble).objectWidth / 2) * adjust,
+                child: Container(
+                  width: 4,
+                  height: 120,
+                  color: Colors.blueGrey,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    // Logic to repeat the song
-                    repeatSong();
-                  },
-                  child: Text('Repetir Canción'),
-                ),
-              ],
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: DropdownButton<String>(
+            value: currentTimerDuration == TIMER_RAPIDO
+                ? 'Rápido'
+                : currentTimerDuration == TIMER_NORMAL
+                    ? 'Normal'
+                    : 'Lento',
+            items: <String>['Rápido', 'Normal', 'Lento']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                _changeSpeed(newValue);
+              }
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            child: ValueListenableBuilder(
+              valueListenable: isRecording,
+              builder: (context, value, widget) {
+                if (value == false) {
+                  return FloatingActionButton(
+                    onPressed: () {
+                      isRecording.value = true;
+                      start();
+                    },
+                    backgroundColor: Colors.blue,
+                    child: const Icon(Icons.mic),
+                  );
+                } else {
+                  return FloatingActionButton(
+                    onPressed: () {
+                      isRecording.value = false;
+                      stop(false);
+                    },
+                    backgroundColor: Colors.red,
+                    child: const Icon(Icons.adjust),
+                  );
+                }
+              },
             ),
           ),
-        );
-
-        // Si shouldPop es null, significa que se cerró el diálogo sin elegir ninguna opción
-        // Devuelve false para evitar que Flutter maneje el pop
-        return shouldPop != null;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Modo práctica'),
         ),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: Stack(
-                children: [
-                  // Ajusta según tu implementación de MusicSheetWidgetAux
-                  Positioned(
-                    left: _currentOffset,
-                    child: MusicSheetWidgetAux(notes: displayNotes),
-                  ),
-                  Positioned(
-                    top: 75, // Ajustar según necesidad
-                    left: 139 +
-                        (widget.notes[0]
-                                    .buildNote(ClefType.treble)
-                                    .objectWidth /
-                                2) *
-                            adjust, // Ajustar según necesidad
-                    child: Container(
-                      width: 4, // Ancho de la línea vertical
-                      height: 120, // Altura de la línea vertical
-                      color: Colors.blueGrey, // Color de la línea vertical
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                child: ValueListenableBuilder(
-                  valueListenable: isRecording,
-                  builder: (context, value, widget) {
-                    if (value == false) {
-                      return FloatingActionButton(
-                        onPressed: () {
-                          isRecording.value = true;
-                          start();
-                        },
-                        backgroundColor: Colors.blue,
-                        child: const Icon(Icons.mic),
-                      );
-                    } else {
-                      return FloatingActionButton(
-                        onPressed: () {
-                          isRecording.value = false;
-                          stop(false);
-                        },
-                        backgroundColor: Colors.red,
-                        child: const Icon(Icons.adjust),
-                      );
-                    }
-                  },
-                ),
-              ),
-            ),
-            // Botón flotante temporal para avanzar la partitura manualmente
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FloatingActionButton(
-                onPressed: _advanceSheet,
-                child: Icon(Icons.arrow_forward),
-              ),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FloatingActionButton(
+            onPressed: _advanceSheet,
+            child: Icon(Icons.arrow_forward),
+          ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
 }
 
 class MusicSheetWidgetAux extends StatelessWidget {

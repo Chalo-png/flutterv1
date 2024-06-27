@@ -140,11 +140,12 @@ class _DifficultyPageState extends State<GeneratorDisplayScreen> {
       if(_isPlaying){
         String soundPath = '${currentNote['note']}.mp3'; // Ruta al archivo de sonido
 
-        await _audioPlayer.play(AssetSource(soundPath)); // Reproducir el sonido
-
-        await Future.delayed(Duration(seconds: currentNote['duration'])); // Esperar la duración de la nota
-        if(_audioPlayer!=null){
+        try {
+          await _audioPlayer.play(AssetSource(soundPath)); // Reproducir el sonido
+          await Future.delayed(Duration(seconds: currentNote['duration'])); // Esperar la duración de la nota
           await _audioPlayer.release();
+        } catch (e) {
+          print(e); 
         }
       }else{
         break;

@@ -7,6 +7,7 @@ import 'package:test2/rutas/n_lecciones/leccion1.dart';
 import 'package:test2/rutas/generar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:test2/chatbot/chatbot.dart';
 
 void main() async {
@@ -18,8 +19,19 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    _checkPermission();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +49,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
+Future<void> _checkPermission() async {
+  if (!(await Permission.microphone.isGranted)) {
+    var status = await Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      // Permiso denegado, puedes mostrar un mensaje o tomar otra acción
+    }
+  }
+}
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -49,6 +70,62 @@ class HomeScreen extends StatelessWidget {
       body: Center(
           child: Row(
         children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CustomButton(
+                  text: 'Practica',
+                  color: Colors.yellow,
+                  onTap: () {
+                    Navigator.pushNamed(context, '/cancionesPrecargadas');
+                  },
+                ),
+                CustomButton(
+                  text: 'Genera melodia',
+                  color: Colors.red[200]!,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => GeneratorDisplayScreen()),
+                    );
+                  },
+                ),
+                CustomButton(
+                  text: 'Lecciones',
+                  color: Colors.red[200]!,
+                  onTap: () {
+                    Navigator.pushNamed(context, '/lecciones');
+                  },
+                ),
+                CustomButton(
+                  text: 'Minijuegos',
+                  color: Colors.blue[200]!,
+                  onTap: () {
+                    // Navigate to Minijuegos Screen
+                  },
+                ),
+                CustomButton(
+                  text: 'Asistente',
+                  color: const Color.fromARGB(255, 214, 50, 126)!,
+                  onTap: () {
+                    // Navigate to Minijuegos Screen
+                    Navigator.pushNamed(context, '/asistente');
+                  },
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 10,
+            right: 20,
+            child: SizedBox(
+              width: 50,
+              height: 50,
+              child: Chatbot(),
+            ),
+          ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
