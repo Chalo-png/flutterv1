@@ -7,6 +7,7 @@ import 'package:test2/rutas/n_lecciones/leccion1.dart';
 import 'package:test2/rutas/generar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:test2/chatbot/chatbot_tutorial.dart';
 import 'package:test2/chatbot/chatbot.dart';
 
 void main() async {
@@ -37,9 +38,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int valor = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,7 +93,19 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
-          Chatbot(),
+          IndexedStack(
+            index: valor,
+            children: [
+              Chatbot_Tutorial(
+                cambiarIndex: (nuevoValor) {
+                  setState(() {
+                    valor = nuevoValor;
+                  });
+                },
+              ),
+              Chatbot(),
+            ],
+          ),
         ],
       )),
     );

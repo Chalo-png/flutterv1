@@ -8,6 +8,7 @@ import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:test2/models/user.dart';
 import 'chat_page.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class Chatbot extends StatefulWidget {
   @override
@@ -84,7 +85,7 @@ class _Chatbot extends State<Chatbot> {
     super.initState();
     getEdad(userId);
     contextText =
-        'Eres el asistente una aplicación llamada Piano Colors, que se enfoca en la enseñanza de piano a niños con síndrome de Down. Recuerda ajustar tu respuesta de modo que ellos lo entiendan, son niños con capacidades diferentes y tus respuestas deben ser siempre afirmaciones. El usuario actual se llama $userName, de $age años de edad. Recuerda ajustar tu respuestar tomando en cuenta la edad del usuario y el hecho de que tiene Sindrome de Down. RECUERDA AJUSTAR TU RESPUESTA SEGUN LA EDAD DEL USUARIO Y NO REPITAS TUS RESPUESTAS. Menciona la edad del usuario en tu respuesta';
+        'Eres el asistente una aplicación llamada Piano Colors, que se enfoca en la enseñanza de piano a niños con síndrome de Down. Actualmente tiene 4 modos: 1.Practicar una cancion con un piano real, con reconocimiento de notas, 2. Generar una cancion segun un nivel de dificultad, 3. Lecciones de conceptos musicales, tales como sonidos y silencios, 4. Minijuegos para reforzar conceptos musicales, como memorice. Recuerda ajustar tu respuesta de modo que ellos lo entiendan, son niños con capacidades diferentes y tus respuestas deben ser siempre afirmaciones. El usuario actual se llama $userName, de $age años de edad. Recuerda ajustar tu respuestar tomando en cuenta la edad del usuario y el hecho de que tiene Sindrome de Down. RECUERDA AJUSTAR TU RESPUESTA SEGUN LA EDAD DEL USUARIO Y NO REPITAS TUS RESPUESTAS. Menciona la edad del usuario en tu respuesta';
     print(contextText);
     _fetchEdad();
   }
@@ -134,7 +135,7 @@ class _Chatbot extends State<Chatbot> {
   /// Shows the text character by character with a delay.
   void MostrarTexto(String text) async {
     String greetingResponse;
-    _flutterTts.setSpeechRate(0.1);
+    _flutterTts.setSpeechRate(0.5);
 
     int localIndex = 0;
     if (isFirstTime) {
@@ -228,6 +229,7 @@ class _Chatbot extends State<Chatbot> {
     _buttonName2 = removeLeadingAsterisksAndSpaces(relatedTopics[1]);
     _buttonName3 = removeLeadingAsterisksAndSpaces(relatedTopics[2]);
     _buttonName4 = removeLeadingAsterisksAndSpaces(relatedTopics[3]);
+    getRelatedIcons(relatedTopics);
   }
 
   /// Handles the button press event for the Reformular button.
@@ -244,6 +246,7 @@ class _Chatbot extends State<Chatbot> {
     _buttonName2 = removeLeadingAsterisksAndSpaces(relatedTopics[1]);
     _buttonName3 = removeLeadingAsterisksAndSpaces(relatedTopics[2]);
     _buttonName4 = removeLeadingAsterisksAndSpaces(relatedTopics[3]);
+    getRelatedIcons(relatedTopics);
   }
 
   /// Handles the button press event for the Relacionado button.
@@ -260,6 +263,7 @@ class _Chatbot extends State<Chatbot> {
     _buttonName2 = removeLeadingAsterisksAndSpaces(relatedTopics[1]);
     _buttonName3 = removeLeadingAsterisksAndSpaces(relatedTopics[2]);
     _buttonName4 = removeLeadingAsterisksAndSpaces(relatedTopics[3]);
+    getRelatedIcons(relatedTopics);
   }
 
   /// Handles the button press event for the Preguntar button.
@@ -279,11 +283,11 @@ class _Chatbot extends State<Chatbot> {
     _buttonName2 = removeLeadingAsterisksAndSpaces(relatedTopics[1]);
     _buttonName3 = removeLeadingAsterisksAndSpaces(relatedTopics[2]);
     _buttonName4 = removeLeadingAsterisksAndSpaces(relatedTopics[3]);
+    getRelatedIcons(relatedTopics);
   }
 
   /// Handles the button press event for the Pizza button.
   void presiono_pizza() {
-    print("Pizza Miau");
     setState(() {
       isVisibleChat = false;
       isVisibleMenu = true;
@@ -396,13 +400,57 @@ class _Chatbot extends State<Chatbot> {
     _buttonName2 = removeLeadingAsterisksAndSpaces(relatedTopics[1]);
     _buttonName3 = removeLeadingAsterisksAndSpaces(relatedTopics[2]);
     _buttonName4 = removeLeadingAsterisksAndSpaces(relatedTopics[3]);
+    getRelatedIcons(relatedTopics);
     return res;
   }
 
-  final IconData iconExplicacion = Icons.info;
-  final IconData iconReformular = Icons.autorenew;
-  final IconData iconTemasRelacionados = Icons.add;
-  final IconData iconPreguntar = Icons.help;
+  IconData iconExplicacion = Icons.info;
+  IconData iconReformular = Icons.autorenew;
+  IconData iconTemasRelacionados = Icons.add;
+  IconData iconPreguntar = Icons.help;
+  IconData iconChatbot = Icons.chat;
+
+  Future<void> getRelatedIcons(List<String> topics) async {
+    String text = topics[0] + topics[1] + topics[2] + topics[3];
+    String getRelatedIconsText =
+        'Eres un recomendador de iconos para flutter. Estos debe ser capaces de guardarse en la variable tipo IconData. Solo debes responder con el texto de por ejemplo: Icons.music_note, Icons.home,etc. Solo debes sugerir iconos presentes en material design. El formato de entrada es * Respuesta1 * Respuesta2 * Respuesta3 *  Respuesta4 y el formato de salida es Salida1 * Salida2 * Salida3 * Salida4. \nEntrada : ' +
+            text;
+    List<String> relatedIcons = [];
+    List<Map<String, dynamic>> messagesHistory = [
+      Messages(role: Role.user, content: getRelatedIconsText).toJson()
+    ];
+    final request = ChatCompleteText(
+      messages: messagesHistory,
+      maxToken: 200,
+      model: GptTurboChatModel(),
+    );
+    final response = await _openAI.onChatCompletion(request: request);
+    for (var element in response!.choices) {
+      if (element.message != null) {
+        setState(() {
+          _messages.insert(
+            0,
+            ChatMessage(
+              user: _gptChatUser,
+              createdAt: DateTime.now(),
+              text: element.message!.content,
+            ),
+          );
+        });
+        print(element.message!.content);
+        relatedIcons = getMatches(element.message!.content, RegExp(r"\*[^*]+"));
+      }
+    }
+    print(relatedIcons);
+    if (relatedIcons.isNotEmpty) {
+      iconExplicacion = MdiIcons.fromString(relatedIcons[0].split('.').last)!;
+      iconReformular = MdiIcons.fromString(relatedIcons[1].split('.').last)!;
+      iconTemasRelacionados =
+          MdiIcons.fromString(relatedIcons[2].split('.').last)!;
+
+      iconPreguntar = MdiIcons.fromString(relatedIcons[3].split('.').last)!;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -413,14 +461,14 @@ class _Chatbot extends State<Chatbot> {
             padding: EdgeInsets.only(
               left: MediaQuery.of(context).orientation == Orientation.portrait
                   ? 0.0
-                  : 70.0,
+                   : 140.0,
               top: MediaQuery.of(context).orientation == Orientation.portrait
-                  ? 300.0
-                  : 70.0,
+                  ? 0.0
+                  : 260.0,
               right: 0.0,
               bottom: MediaQuery.of(context).orientation == Orientation.portrait
                   ? 0.0
-                  : 10.0,
+                  : 0.0,
             ),
             child: IndexedStack(
               index: _currentIndex,
@@ -466,7 +514,7 @@ class _Chatbot extends State<Chatbot> {
                           AnimatedCard(
                             isVisible: isVisibleMenu,
                             text: "Preguntar por texto",
-                            icon: iconPreguntar,
+                            icon: iconChatbot,
                             onTap: () {
                               // presiono_preguntar();
                               Navigator.push(
@@ -488,16 +536,16 @@ class _Chatbot extends State<Chatbot> {
                       left: MediaQuery.of(context).orientation ==
                               Orientation.portrait
                           ? 0.0
-                          : 0.0,
+                            : 20.0,
                       top: MediaQuery.of(context).orientation ==
                               Orientation.portrait
                           ? 0.0
-                          : 0.0,
-                      right: 0.0,
+                          : 20.0,
+                      right: 20.0,
                       bottom: MediaQuery.of(context).orientation ==
                               Orientation.portrait
-                          ? 300.0
-                          : 10.0,
+                          ? 0.0
+                          : 20.0,
                     ),
                     child: GestureDetector(
                       onTap: isVisibleChat ? presiono_pizza : null,
@@ -519,16 +567,14 @@ class _Chatbot extends State<Chatbot> {
                           ),
                           child: Center(
                             child: SingleChildScrollView(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 20.0, horizontal: 10.0),
-                              physics: BouncingScrollPhysics(),
-                              child: Text(
-                                textoMostrado,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                            physics: BouncingScrollPhysics(),
+                            child: Text(
+                              textoMostrado,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
                                 ),
                               ),
                             ),
