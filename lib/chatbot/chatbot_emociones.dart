@@ -55,7 +55,7 @@ class _Chatbot extends State<Chatbot> {
   }
 
   List<String> Guia = [
-    'El modo practica permite escoger una cancion con distintas dificultases, para que puedas ensayar',
+    '¿Como te sientes?',
   ];
 
   String textoCompleto =
@@ -67,7 +67,7 @@ class _Chatbot extends State<Chatbot> {
   Timer? timer;
 
   Future<void> MostrarTexto(String texto) async {
-    _flutterTts.setSpeechRate(0.1);
+    _flutterTts.setSpeechRate(0.5);
     _flutterTts.speak(texto);
 
     Completer<void> completer = Completer<void>();
@@ -132,7 +132,7 @@ class _Chatbot extends State<Chatbot> {
                       : 0.0,
             ),
             child: EmocionesCard(
-                TipoActividad: "Leccion",
+                TipoActividad: "leccion ?",
                 onSentimientoSelected: widget.onSentimientoSelected),
           ),
           Padding(

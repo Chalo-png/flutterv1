@@ -105,6 +105,7 @@ class _MusicSheetDisplayScreenPracticeModeState
     }
     _stopwatch.stop();
     if (showDialog) {
+      showEndDialog();
       if (songId != null) {
         await showDialogWithEmocionesCard().then((selectedSentimiento) {
           if (selectedSentimiento != null) {
@@ -113,7 +114,6 @@ class _MusicSheetDisplayScreenPracticeModeState
         });
         await handleSave(); // Espera a que handleSave() termine
       }
-      showEndDialog();
     }
   }
 

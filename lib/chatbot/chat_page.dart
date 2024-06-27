@@ -34,8 +34,8 @@ class _ChatPageState extends State<ChatPage> {
   //Usuario del chat GPT
   final ChatUser _gptChatUser = ChatUser(
     id: '2',
-    firstName: 'Chat',
-    lastName: 'GPT',
+    firstName: 'Asistente',
+    lastName: 'Piano Colors',
   );
 
   List<ChatMessage> _messages = <ChatMessage>[];
@@ -52,7 +52,7 @@ class _ChatPageState extends State<ChatPage> {
     );*/
     super.initState();
     greetingText =
-        'Eres el asistente una aplicación llamada Piano Colors, que se enfoca en la enseñanza de piano a niños con síndrome de Down. Recuerda ajustar tu respuesta de modo que ellos lo entiendan, son niños con capacidades diferentes y  tus respuestas deben ser siempre afirmaciones. El usuario actual se llama $userName, de $age años de edad. Recuerda ajustar tu respuestar tomando en cuenta la edad del usuario y el hecho de que tiene Sindrome de Down. El usuario acaba de ingresar a la aplicacion, recibelo con un saludo';
+        'Eres el asistente una aplicación llamada Piano Colors, que se enfoca en la enseñanza de piano a niños con síndrome de Down. Recuerda ajustar tu respuesta de modo que ellos lo entiendan, son niños con capacidades diferentes y tus respuestas deben ser siempre afirmaciones. El usuario actual se llama $userName, de $age años de edad. Recuerda ajustar tu respuestar tomando en cuenta la edad del usuario y el hecho de que tiene Sindrome de Down. RECUERDA AJUSTAR TU RESPUESTA SEGUN LA EDAD DEL USUARIO Y NO REPITAS TUS RESPUESTAS. Menciona la edad del usuario en tu respuesta. Solo debes responder preguntas relacionadas a la musica';
   }
 
   @override
@@ -71,12 +71,7 @@ class _ChatPageState extends State<ChatPage> {
         currentUser: _user,
         messageOptions: const MessageOptions(
           currentUserContainerColor: Colors.black,
-          containerColor: Color.fromRGBO(
-            0,
-            166,
-            126,
-            1,
-          ),
+          containerColor: Color.fromRGBO(5, 6, 92, 1),
           textColor: Colors.white,
         ),
         onSend: (ChatMessage m) {
@@ -99,9 +94,11 @@ class _ChatPageState extends State<ChatPage> {
     List<Map<String, dynamic>> messagesHistory =
         _messages.reversed.toList().map((m) {
       if (m.user == _user) {
-        return Messages(role: Role.user, content: m.text).toJson();
+        return Messages(role: Role.user, content: greetingText! + m.text)
+            .toJson();
       } else {
-        return Messages(role: Role.assistant, content: m.text).toJson();
+        return Messages(role: Role.assistant, content: greetingText! + m.text)
+            .toJson();
       }
     }).toList();
     final request = ChatCompleteText(

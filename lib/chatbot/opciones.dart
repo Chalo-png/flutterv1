@@ -6,7 +6,7 @@ class AnimatedCard extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  AnimatedCard({
+  const AnimatedCard({super.key, 
     required this.isVisible,
     required this.text,
     required this.icon,
@@ -16,7 +16,7 @@ class AnimatedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedOpacity(
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
       opacity: isVisible ? 1.0 : 0.0,
       child: GestureDetector(
         onTap: isVisible ? onTap : null,
@@ -30,12 +30,12 @@ class AnimatedCard extends StatelessWidget {
             ), // borde opcional
           ),
           child: Padding(
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
                 left: 16.0, top: 5.0, right: 16.0, bottom: 10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                SizedBox(height: 10.0),
+                const SizedBox(height: 10.0),
                 Row(
                   children: <Widget>[
                     Icon(
@@ -43,7 +43,7 @@ class AnimatedCard extends StatelessWidget {
                     ),
                     Text(
                       text,
-                      style: TextStyle(fontSize: 14.0),
+                      style: const TextStyle(fontSize: 14.0),
                     ),
                   ],
                 )
