@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import '../../chatbot/emociones.dart';
 import '../../models/leccionM.dart';
 import 'package:test2/models/user.dart';
+import 'package:test2/chatbot/chatbot_emociones.dart';
 
 class Leccion1Screen extends StatelessWidget {
   const Leccion1Screen({super.key});
@@ -439,7 +440,6 @@ class FelicidadesFinalScreen extends StatefulWidget {
 class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
   AudioPlayer audioPlayer = AudioPlayer();
   AudioPlayer audioPlayer2 = AudioPlayer();
-  String sentimiento = "default";
 
   void reproducirSonido(String assetPath) async {
     if (audioPlayer.state != PlayerState.playing) {
@@ -449,79 +449,11 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
     }
   }
 
-  List<LeccionM> setupLeccion(int leccionId, bool completed, String sentimiento) {
-    LeccionM leccion = LeccionM(
-        leccionId: leccionId,
-        completed: completed,
-        sentimiento: sentimiento);
-
-    List<LeccionM> leccionList = [];
-    leccionList.add(leccion);
-    return leccionList;
-  }
-
-  User setupLeccionforsave(List<LeccionM> lecciones, int userId, String email,
-      String password, String userType, int edad) {
-    User user = User(
-      id: userId,
-      email: email,
-      password: password,
-      userType: userType,
-      edad: edad,
-      lecciones: lecciones,
-    );
-
-    return user;
-  }
-  void updateSentimiento(String newSentimiento) {
-    setState(() {
-      sentimiento = newSentimiento;
-    });
-  }
-  Future<String?> showDialogWithEmocionesCard() async {
-    return showDialog<String>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: EmocionesCard(
-            TipoActividad: "practice",
-            onSentimientoSelected: (sentimiento) {
-              Navigator.of(context).pop(sentimiento);
-            },
-          ),
-        );
-      },
-    );
-  }
-  Future<void> setupSentimientoInLeccion() async {
-    await showDialogWithEmocionesCard().then((selectedSentimiento) {
-      if (selectedSentimiento != null) {
-        updateSentimiento(selectedSentimiento);
-      }
-    });
-  }
-
-
-  Future<void> _handleSave() async {
-    await setupSentimientoInLeccion();
-    List<LeccionM> currLeccion = setupLeccion(1, true, sentimiento);
-    String email = "user@example.com";
-    String password = "securePassword";
-    String userType = "Alumno";
-    int edad = 5;
-    User currUser =
-    setupLeccionforsave(currLeccion, 2, email, password, userType, edad);
-    storeUser(currUser);
-  }
-
   @override
   void initState() {
     super.initState();
     audioPlayer.play(AssetSource('aplausos.mp3'));
     audioPlayer2.play(AssetSource('trompeta.mp3'));
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _handleSave();
-    });
   }
 
   @override
@@ -564,12 +496,100 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
             ),
             ElevatedButton(
               onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ChatbotEmocionesFinalScreen()),
+                );
+              },
+              child: const Text('Continuar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ChatbotEmocionesFinalScreen extends StatefulWidget {
+  const ChatbotEmocionesFinalScreen({super.key});
+  @override
+  ChatbotEmocionesFinalScreenState createState() =>
+      ChatbotEmocionesFinalScreenState();
+}
+
+class ChatbotEmocionesFinalScreenState
+    extends State<ChatbotEmocionesFinalScreen> {
+  String sentimiento = "default";
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+    });
+  }
+  Future<void> _handleSave() async {
+    List<LeccionM> currLeccion = setupLeccion(1, true, sentimiento);
+    String email = "user@example.com";
+    String password = "securePassword";
+    String userType = "Alumno";
+    int edad = 5;
+    User currUser =
+    setupLeccionforsave(currLeccion, 2, email, password, userType, edad);
+    storeUser(currUser);
+  }
+  List<LeccionM> setupLeccion(int leccionId, bool completed, String sentimiento) {
+    LeccionM leccion = LeccionM(
+        leccionId: leccionId,
+        completed: completed,
+        sentimiento: sentimiento);
+
+    List<LeccionM> leccionList = [];
+    leccionList.add(leccion);
+    return leccionList;
+  }
+  User setupLeccionforsave(List<LeccionM> lecciones, int userId, String email,
+      String password, String userType, int edad) {
+    User user = User(
+      id: userId,
+      email: email,
+      password: password,
+      userType: userType,
+      edad: edad,
+      lecciones: lecciones,
+    );
+
+    return user;
+  }
+  void updateSentimiento(String newSentimiento) {
+    setState(() {
+      sentimiento = newSentimiento;
+      _handleSave();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('¡Felicidades!'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Chatbot(
+              tipo: 1,
+              onSentimientoSelected: updateSentimiento,
+            ),
+            ElevatedButton(
+              onPressed: sentimiento == "default" ? null : () {
                 Navigator.popUntil(
                   context,
                   ModalRoute.withName('/'),
                 );
               },
-              child: const Text('Volver al Menú Principal'),
+              child: const Text('Volver al menu principal'),
             ),
           ],
         ),
