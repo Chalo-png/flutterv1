@@ -3,6 +3,9 @@ import 'consts.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
 
+/// Chat interface for the Piano Colors chatbot.
+///
+/// The user can interact with the chatbot via text messages. The chatbot will avoid off-topic questions, only answering questions related to music.
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
 
@@ -10,6 +13,7 @@ class ChatPage extends StatefulWidget {
   State<ChatPage> createState() => _ChatPageState();
 }
 
+/// State class of the ChatPage widget.
 class _ChatPageState extends State<ChatPage> {
   RegExp regex = RegExp(r"\*[^*]+");
   String test =
@@ -18,14 +22,15 @@ class _ChatPageState extends State<ChatPage> {
   String age = "7";
   String? greetingText;
 
-  //Iniciar la instancia de OpenAI
+  /// Iniciar la instancia de OpenAI
   final _openAI = OpenAI.instance.build(
       token: OPENAI_API_KEY,
       baseOption: HttpSetup(
         receiveTimeout: const Duration(seconds: 5),
       ),
       enableLog: true);
-  //Usuario del chat (el usuario de la App)
+
+  /// Usuario del chat (el usuario de la App)
   final ChatUser _user = ChatUser(
     id: '1',
     firstName: 'Charles',

@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
 
+/// A widget that displays an animated card with an icon and text.
 class AnimatedCard extends StatelessWidget {
+  /// Whether the card is visible or not.
   final bool isVisible;
+
+  /// The text to display on the card.
   final String text;
+
+  /// The icon to display on the card.
   final IconData icon;
+
+  /// The callback function to be called when the card is tapped.
   final VoidCallback onTap;
 
-  const AnimatedCard({super.key, 
+  /// Creates an [AnimatedCard] widget.
+  const AnimatedCard({
+    Key? key,
     required this.isVisible,
     required this.text,
     required this.icon,
     required this.onTap,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +37,7 @@ class AnimatedCard extends StatelessWidget {
             side: BorderSide(
               color: Colors.grey[300]!,
               width: 1,
-            ), // borde opcional
+            ), // optional border
           ),
           child: Padding(
             padding: const EdgeInsets.only(

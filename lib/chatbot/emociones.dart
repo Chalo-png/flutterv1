@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:test2/chatbot/opciones.dart';
 
+/// A card widget that displays emotions and allows the user to select a sentiment.
 class EmocionesCard extends StatefulWidget {
   final String TipoActividad;
   final Function(String) onSentimientoSelected;
 
+  /// Creates a new instance of [EmocionesCard].
+  ///
+  /// The [TipoActividad] parameter is the type of activity associated with the card.
+  /// The [onSentimientoSelected] parameter is a callback function that is called when a sentiment is selected.
   EmocionesCard({
     required this.TipoActividad,
     required this.onSentimientoSelected,
@@ -22,6 +27,9 @@ class _EmocionesCard extends State<EmocionesCard> {
   final IconData contento = Icons.sentiment_satisfied_outlined;
   final IconData emocionado = Icons.sentiment_very_satisfied_rounded;
 
+  /// Handles the selection of an emoji.
+  ///
+  /// The [valor] parameter is the value associated with the selected emoji.
   void presiono_emoji(String valor) {
     print(widget.TipoActividad);
     widget.onSentimientoSelected(valor);
@@ -78,7 +86,8 @@ class _EmocionesCard extends State<EmocionesCard> {
                               vertical: 20.0, horizontal: 10.0),
                           physics: BouncingScrollPhysics(),
                           child: Text(
-                            "¿Como te sentiste con esta " + widget.TipoActividad,
+                            "¿Como te sentiste con esta " +
+                                widget.TipoActividad,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 20.0,

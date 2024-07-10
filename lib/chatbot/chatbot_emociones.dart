@@ -4,10 +4,15 @@ import 'dart:async';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:test2/chatbot/emociones.dart';
 
+/// A stateful widget that represents a chatbot.
 class Chatbot extends StatefulWidget {
   final int tipo;
   final Function(String) onSentimientoSelected;
 
+  /// Creates a new instance of the [Chatbot] widget.
+  ///
+  /// The [tipo] parameter specifies the type of the chatbot.
+  /// The [onSentimientoSelected] parameter is a callback function that is called when a sentiment is selected.
   Chatbot({
     required this.tipo,
     required this.onSentimientoSelected,
@@ -17,6 +22,7 @@ class Chatbot extends StatefulWidget {
   _Chatbot createState() => _Chatbot();
 }
 
+/// The private state class for the [Chatbot] widget.
 class _Chatbot extends State<Chatbot> {
   bool isVisibleMenu = false;
   bool isVisibleChat = false;
@@ -29,6 +35,7 @@ class _Chatbot extends State<Chatbot> {
 
   Map? _currentVoice;
 
+  /// Initializes the text-to-speech engine.
   void initTTS() {
     _flutterTts.getVoices.then((data) {
       try {
@@ -50,6 +57,7 @@ class _Chatbot extends State<Chatbot> {
     });
   }
 
+  /// Sets the voice for the text-to-speech engine.
   void setVoice(Map voice) {
     _flutterTts.setVoice({"name": voice["name"], "locale": voice["locale"]});
   }
@@ -66,6 +74,7 @@ class _Chatbot extends State<Chatbot> {
   int currentIndex = 0;
   Timer? timer;
 
+  /// Displays the given [texto] character by character with a delay.
   Future<void> MostrarTexto(String texto) async {
     _flutterTts.setSpeechRate(0.5);
     _flutterTts.speak(texto);
@@ -97,6 +106,7 @@ class _Chatbot extends State<Chatbot> {
     return completer.future;
   }
 
+  /// Sets the [textoCompleto] to the given [value].
   void ChatTexto(String value) {
     setState(() {
       textoCompleto = value;

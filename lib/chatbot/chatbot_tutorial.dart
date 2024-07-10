@@ -4,15 +4,20 @@ import 'dart:async';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:test2/chatbot/emociones.dart';
 
+/// A stateful widget that represents the Chatbot Tutorial screen.
 class Chatbot_Tutorial extends StatefulWidget {
   final Function(int) cambiarIndex;
 
+  /// Creates a new instance of [Chatbot_Tutorial].
+  ///
+  /// The [cambiarIndex] parameter is a callback function that takes an integer as a parameter.
   Chatbot_Tutorial({required this.cambiarIndex});
 
   @override
   _Chatbot_Tutorial createState() => _Chatbot_Tutorial();
 }
 
+/// The private state class for the [Chatbot_Tutorial] widget.
 class _Chatbot_Tutorial extends State<Chatbot_Tutorial> {
   bool isVisibleMenu = false;
   bool isVisibleChat = false;
@@ -29,6 +34,7 @@ class _Chatbot_Tutorial extends State<Chatbot_Tutorial> {
 
   Map? _currentVoice;
 
+  /// Initializes the Text-to-Speech engine and sets the default voice.
   void initTTS() {
     _flutterTts.getVoices.then((data) {
       try {
@@ -54,6 +60,7 @@ class _Chatbot_Tutorial extends State<Chatbot_Tutorial> {
 
   int indice = 0;
 
+  /// Handles the event when the "Guia" button is pressed.
   void presiono_guia() {
     setState(() {
       shouldContinue = false;
@@ -68,6 +75,7 @@ class _Chatbot_Tutorial extends State<Chatbot_Tutorial> {
     guia_pausa = Icons.pause;
   }
 
+  /// Handles the event when the "Pausa" button is pressed.
   void presiono_pausa() {
     if (indice >= Guia.length) {
       setState(() {
@@ -99,11 +107,12 @@ class _Chatbot_Tutorial extends State<Chatbot_Tutorial> {
     }
   }
 
+  /// Sets the voice for the Text-to-Speech engine.
   void setVoice(Map voice) {
     _flutterTts.setVoice({"name": voice["name"], "locale": voice["locale"]});
   }
 
-List<String> Guia = [
+  List<String> Guia = [
     'Bienvenido a Piano Color!\n Con nosotros podrás aprender conceptos de música y tocar divertidas canciones',
     'El modo práctica permite escoger una canción, para que puedas ensayar',
     'El modo Generar una Melodia permite generar fragmentos musicales para que tengas más para practicar',
@@ -119,6 +128,7 @@ List<String> Guia = [
   bool shouldContinue = true;
   Timer? timer;
 
+  /// Displays the text character by character with a delay.
   Future<void> MostrarTexto(String texto) async {
     _flutterTts.setSpeechRate(0.1);
     _flutterTts.speak(texto);
@@ -246,11 +256,25 @@ List<String> Guia = [
                   index: _IndexTalk,
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.3, // 40% del ancho de la pantalla
-                      height: MediaQuery.of(context).size.height * 0.5, // 30% del alto de la pantalla
+                      width: MediaQuery.of(context).size.width *
+                          0.3, // 40% del ancho de la pantalla
+                      height: MediaQuery.of(context).size.height *
+                          0.5, // 30% del alto de la pantalla
+                      child: Image.asset(
+                        'assets/chatbot_camaleon_color_final.png',
+                        fit: BoxFit
+                            .contain, // Ajusta el tamaño de la imagen para que quepa en el contenedor
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width *
+                          0.3, // 40% del ancho de la pantalla
+                      height: MediaQuery.of(context).size.height *
+                          0.5, // 30% del alto de la pantalla
                       child: Image.asset(
                         'assets/chatbot_camaleon_color_habla_final.png',
-                        fit: BoxFit.contain, // Ajusta el tamaño de la imagen para que quepa en el contenedor
+                        fit: BoxFit
+                            .contain, // Ajusta el tamaño de la imagen para que quepa en el contenedor
                       ),
                     ),
                   ],

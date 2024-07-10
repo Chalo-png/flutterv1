@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:test2/widgets/widget_musicSheet/simple_sheet_music.dart';
 
+/// Screen for generating melodies.
 class GeneraMelodiaScreen extends StatefulWidget {
   @override
   _GeneraMelodiaScreenState createState() => _GeneraMelodiaScreenState();
@@ -11,16 +12,31 @@ class GeneraMelodiaScreen extends StatefulWidget {
 //Todas las notas del Piano
 var notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 //Solo en el PMV se considera la escala C
-var scales = [[0, 2, 4, 5, 7, 9, 11]];
+var scales = [
+  [0, 2, 4, 5, 7, 9, 11]
+];
 //Solo en PMV se consideran acordes mayores y menores
-var chords = [[0, 4, 7], [0, 3, 7]];
+var chords = [
+  [0, 4, 7],
+  [0, 3, 7]
+];
 //Solo en PMC se considera negra, blanca y redonda
 var duration = [1, 2, 4];
-var durationProb = [[0.1, 0.3, 0.6], [0.3, 0.4, 0.3], [0.7, 0.2, 0.1]];
+var durationProb = [
+  [0.1, 0.3, 0.6],
+  [0.3, 0.4, 0.3],
+  [0.7, 0.2, 0.1]
+];
 var chordDurarion = [2, 4];
 //Progresión de acordes clasica
-var chordProggresion = [[0, 3, 4, 4], [0, 0, 3, 4], [0, 3, 0, 4], [0, 3, 4, 3]];
+var chordProggresion = [
+  [0, 3, 4, 4],
+  [0, 0, 3, 4],
+  [0, 3, 0, 4],
+  [0, 3, 4, 3]
+];
 
+/// State class for the GeneraMelodiaScreen widget.
 class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
   String selectedDifficulty = "";
   List<Note> generatedNotes = [];
@@ -88,41 +104,53 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
       ),
     );
   }
+
+  /// Generates the data for the notes.
   List<Map<String, dynamic>> generateNotesData() {
     int compassAmount = 4; //Numero de compases de la partitura a generar
     int compassDuration = 4; //Numero de tiempos dentro de cada compas
     var data = <Map<String, dynamic>>[]; //Datos a devolver
     final rand = Random(); //Random
-    var selectedScale = scales[rand.nextInt(scales.length)]; //Escala elegida al azar
-    var selectedNotes = selectedScale.map((idx)=> notes[idx]).toList(); //Notas que corresponden a esa escala
-    var selectedProgression = chordProggresion[rand.nextInt(chordProggresion.length)]; //Progresion elegida al azar
-    int diff = selectedDifficulty == 'Fácil' ? 0 : selectedDifficulty=='Medio' ? 1 : 2; //Dificultad en valor entero
+    var selectedScale =
+        scales[rand.nextInt(scales.length)]; //Escala elegida al azar
+    var selectedNotes = selectedScale
+        .map((idx) => notes[idx])
+        .toList(); //Notas que corresponden a esa escala
+    var selectedProgression = chordProggresion[
+        rand.nextInt(chordProggresion.length)]; //Progresion elegida al azar
+    int diff = selectedDifficulty == 'Fácil'
+        ? 0
+        : selectedDifficulty == 'Medio'
+            ? 1
+            : 2; //Dificultad en valor entero
     for (var i = 0; i < compassAmount; i++) {
       int localCompass = compassDuration; //Contador de tiempos del compas local
-      int localProgression = selectedProgression[i % selectedProgression.length]; //Nota base del compas local (Nota Corazón)
-      while (localCompass!=0){ 
+      int localProgression = selectedProgression[i %
+          selectedProgression
+              .length]; //Nota base del compas local (Nota Corazón)
+      while (localCompass != 0) {
         final r = Random(); //Random
         String note; //Nota (o notas) local
         int localDuration = 5; //Duración de la nota actual
         bool isChord = false; //Transformar nota actual en acorde?
-        //(r.nextInt(10) < diff*2)&&(localCompass>1); 
+        //(r.nextInt(10) < diff*2)&&(localCompass>1);
         do {
-          if(isChord){
+          if (isChord) {
             localDuration = chordDurarion[r.nextInt(chordDurarion.length)];
-          }else{
+          } else {
             var localProb = durationProb[diff];
             var randDouble = r.nextDouble();
             double counter = 0.0;
             for (var j = 0; j < localProb.length; j++) {
               counter += localProb[j];
-              if(counter>=randDouble){    
+              if (counter >= randDouble) {
                 localDuration = duration[j];
                 break;
               }
             }
           }
-        } while (localCompass-localDuration<0);
-        note = selectedNotes[localProgression + r.nextInt(3)]+"4";
+        } while (localCompass - localDuration < 0);
+        note = selectedNotes[localProgression + r.nextInt(3)] + "4";
         /*
         if(!isChord){
           note = selectedNotes[localProgression + r.nextInt(3)]+"4";
@@ -134,12 +162,13 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
           'duration': localDuration,
         };
         data.add(localNote);
-        localCompass-=localDuration;
+        localCompass -= localDuration;
       }
     }
     return data;
   }
 
+  /// Converts the generated notes data to Note objects.
   List<Note> convertToMusicObjects() {
     var data = generateNotesData();
     List<Note> musicObjects = [];
@@ -164,6 +193,7 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
     return musicObjects;
   }
 
+  /// Converts a note name to a Pitch object.
   Pitch convertToPitch(String noteName) {
     switch (noteName) {
       case 'C5':
@@ -189,6 +219,7 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
     }
   }
 
+  /// Converts a duration value to a NoteDuration object.
   NoteDuration convertToNoteDuration(int duration) {
     switch (duration) {
       case 1:
@@ -203,13 +234,18 @@ class _GeneraMelodiaScreenState extends State<GeneraMelodiaScreen> {
   }
 }
 
+/// Button widget for selecting difficulty.
 class DifficultyButton extends StatelessWidget {
   final String text;
   final Color color;
   final bool isSelected;
   final VoidCallback onTap;
 
-  DifficultyButton({required this.text, required this.color, required this.isSelected, required this.onTap});
+  DifficultyButton(
+      {required this.text,
+      required this.color,
+      required this.isSelected,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +261,8 @@ class DifficultyButton extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: TextStyle(fontSize: 20, color: isSelected ? Colors.white : Colors.black),
+          style: TextStyle(
+              fontSize: 20, color: isSelected ? Colors.white : Colors.black),
         ),
       ),
     );

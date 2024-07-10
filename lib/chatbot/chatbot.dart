@@ -10,6 +10,7 @@ import 'chat_page.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+/// A widget representing the Chatbot.
 class Chatbot extends StatefulWidget {
   @override
   _Chatbot createState() => _Chatbot();
@@ -33,6 +34,7 @@ class _Chatbot extends State<Chatbot> {
 
   Map? _currentVoice;
 
+  /// Initializes the Text-to-Speech engine.
   void initTTS() {
     _flutterTts.getVoices.then((data) {
       try {
@@ -54,6 +56,7 @@ class _Chatbot extends State<Chatbot> {
     });
   }
 
+  /// Sets the voice for Text-to-Speech.
   void setVoice(Map voice) {
     _flutterTts.setVoice({"name": voice["name"], "locale": voice["locale"]});
   }
@@ -90,6 +93,7 @@ class _Chatbot extends State<Chatbot> {
     _fetchEdad();
   }
 
+  /// Fetches the user's age.
   Future<void> _fetchEdad() async {
     int? edad = await getUserEdadById(0);
     if (edad != null) {
@@ -128,6 +132,8 @@ class _Chatbot extends State<Chatbot> {
     'El modo Minijuego tiene distintos juegos para que puedas divertirte',
     'Espero que disfrutes y aprendas con Piano Colors'
   ];
+
+  /// Handles the button press event for the Guia button.
   void presiono_guia() {
     MostrarTexto(Guia[1]);
   }
@@ -203,6 +209,7 @@ class _Chatbot extends State<Chatbot> {
     return res;
   }
 
+  /// Removes leading asterisks and spaces from the input string.
   String removeLeadingAsterisksAndSpaces(String input) {
     return input.replaceAll(RegExp(r'^[\*\s]+'), '');
   }
@@ -461,7 +468,7 @@ class _Chatbot extends State<Chatbot> {
             padding: EdgeInsets.only(
               left: MediaQuery.of(context).orientation == Orientation.portrait
                   ? 0.0
-                   : 140.0,
+                  : 140.0,
               top: MediaQuery.of(context).orientation == Orientation.portrait
                   ? 0.0
                   : 260.0,
@@ -536,7 +543,7 @@ class _Chatbot extends State<Chatbot> {
                       left: MediaQuery.of(context).orientation ==
                               Orientation.portrait
                           ? 0.0
-                            : 20.0,
+                          : 20.0,
                       top: MediaQuery.of(context).orientation ==
                               Orientation.portrait
                           ? 0.0
@@ -567,14 +574,14 @@ class _Chatbot extends State<Chatbot> {
                           ),
                           child: Center(
                             child: SingleChildScrollView(
-                            physics: BouncingScrollPhysics(),
-                            child: Text(
-                              textoMostrado,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                              physics: BouncingScrollPhysics(),
+                              child: Text(
+                                textoMostrado,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
                                 ),
                               ),
                             ),
