@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         '/practica': (context) => PracticaScreen(),
         '/generaMelodia': (context) => GeneratorDisplayScreen(),
         '/vistaPrevia': (context) => MusicSheetDisplayScreen(),
-        '/': (context) => const HomeScreen(),
+        '/': (context) => HomeScreen(),
         '/lecciones': (context) => const LeccionesScreen(),
         '/leccion1': (context) => const Leccion1Screen(),
       },
@@ -39,75 +39,149 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
-
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   int valor = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Piano App'),
       ),
-      body: Center(
-          child: Row(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CustomButton(
-                text: 'Practica',
-                color: Colors.yellow,
-                onTap: () {
-                  Navigator.pushNamed(context, '/cancionesPrecargadas');
-                },
-              ),
-              CustomButton(
-                text: 'Genera melodia',
-                color: Colors.red[200]!,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => GeneratorDisplayScreen()),
-                  );
-                },
-              ),
-              CustomButton(
-                text: 'Lecciones',
-                color: Colors.red[200]!,
-                onTap: () {
-                  Navigator.pushNamed(context, '/lecciones');
-                },
-              ),
-              CustomButton(
-                text: 'Minijuegos',
-                color: Colors.blue[200]!,
-                onTap: () {
-                  // Navigate to Minijuegos Screen
-                },
-              ),
-            ],
-          ),
-          IndexedStack(
-            index: valor,
-            children: [
-              Chatbot_Tutorial(
-                cambiarIndex: (nuevoValor) {
-                  setState(() {
-                    valor = nuevoValor;
-                  });
-                },
-              ),
-              Chatbot(),
-            ],
-          ),
-        ],
-      )),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth > 600) {
+            // Pantallas grandes (tablets, pantallas grandes)
+            return Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CustomButton(
+                        text: 'Práctica',
+                        color: Colors.yellow,
+                        onTap: () {
+                          Navigator.pushNamed(context, '/cancionesPrecargadas');
+                        },
+                      ),
+                      CustomButton(
+                        text: 'Generar una melodía',
+                        color: Colors.red[200]!,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => GeneratorDisplayScreen()),
+                          );
+                        },
+                      ),
+                      CustomButton(
+                        text: 'Lecciones',
+                        color: Colors.red[200]!,
+                        onTap: () {
+                          Navigator.pushNamed(context, '/lecciones');
+                        },
+                      ),
+                      CustomButton(
+                        text: 'Minijuegos',
+                        color: Colors.blue[200]!,
+                        onTap: () {
+                          // Navigate to Minijuegos Screen
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: IndexedStack(
+                    index: valor,
+                    children: [
+                      Chatbot_Tutorial(
+                        cambiarIndex: (nuevoValor) {
+                          setState(() {
+                            valor = nuevoValor;
+                          });
+                        },
+                      ),
+                      Chatbot(),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          } else {
+            // Pantallas pequeñas (teléfonos)
+            return Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CustomButton(
+                          text: 'Práctica',
+                          color: Colors.yellow,
+                          onTap: () {
+                            Navigator.pushNamed(context, '/cancionesPrecargadas');
+                          },
+                        ),
+                        CustomButton(
+                          text: 'Generar una melodía',
+                          color: Colors.red[200]!,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => GeneratorDisplayScreen()),
+                            );
+                          },
+                        ),
+                        CustomButton(
+                          text: 'Lecciones',
+                          color: Colors.red[200]!,
+                          onTap: () {
+                            Navigator.pushNamed(context, '/lecciones');
+                          },
+                        ),
+                        CustomButton(
+                          text: 'Minijuegos',
+                          color: Colors.blue[200]!,
+                          onTap: () {
+                            // Navigate to Minijuegos Screen
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  height: constraints.maxHeight * 0.4,
+                  child: IndexedStack(
+                    index: valor,
+                    children: [
+                      Chatbot_Tutorial(
+                        cambiarIndex: (nuevoValor) {
+                          setState(() {
+                            valor = nuevoValor;
+                          });
+                        },
+                      ),
+                      Chatbot(),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }
+        },
+      ),
     );
   }
 }
@@ -117,11 +191,12 @@ class CustomButton extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
-  const CustomButton(
-      {super.key,
-      required this.text,
-      required this.color,
-      required this.onTap});
+  const CustomButton({
+    super.key,
+    required this.text,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {

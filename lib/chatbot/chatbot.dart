@@ -121,12 +121,12 @@ class _Chatbot extends State<Chatbot> {
   int indice = 0;
 
   List<String> Guia = [
-    'Bienvenido a Piano Color!\n Con nosotros podras aprender conceptos de musica y tocar divertidas canciones',
-    'El modo practica permite escoger una cancion con distintas dificultases, para que puedas ensayar',
-    'El modo Generar Melodia permite generar fragmentos musicales para que tengas mas para practicar',
-    'El modo Leccion tiene distintos enseñansas y ejercicios asociados',
+    'Bienvenido a Piano Color!\n Con nosotros podrás aprender conceptos de música y tocar divertidas canciones',
+    'El modo práctica permite escoger una canción, para que puedas ensayar',
+    'El modo Generar una Melodia permite generar fragmentos musicales para que tengas más para practicar',
+    'El modo Leccion tiene distintas enseñanzas y ejercicios asociados',
     'El modo Minijuego tiene distintos juegos para que puedas divertirte',
-    'Espero que disfrute y aprendas con Piano Colors'
+    'Espero que disfrutes y aprendas con Piano Colors'
   ];
   void presiono_guia() {
     MostrarTexto(Guia[1]);
