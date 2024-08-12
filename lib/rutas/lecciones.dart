@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import '../models/leccionM.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// A screen that displays a list of lessons.
 class LeccionesScreen extends StatefulWidget {
-  const LeccionesScreen({super.key});
+  const LeccionesScreen({Key? key}) : super(key: key);
 
   @override
   LeccionesScreenState createState() => LeccionesScreenState();
 }
 
+/// The state of the [LeccionesScreen].
 class LeccionesScreenState extends State<LeccionesScreen> {
   bool leccion1Completada = false;
   bool leccion2Completada = false;
@@ -22,6 +24,7 @@ class LeccionesScreenState extends State<LeccionesScreen> {
     _fetchLeccion();
   }
 
+  /// Fetches the lesson data for the given user and lesson ID.
   Future<void> _fetchLeccion() async {
     LeccionM? leccion = await getLeccionByUserIdAndLeccionId(userId, leccionId);
     if (leccion != null) {
@@ -38,6 +41,7 @@ class LeccionesScreenState extends State<LeccionesScreen> {
     }
   }
 
+  /// Retrieves the lesson data for the given user and lesson ID from Firestore.
   Future<LeccionM?> getLeccionByUserIdAndLeccionId(
       int userId, int leccionId) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -112,6 +116,7 @@ class LeccionesScreenState extends State<LeccionesScreen> {
   }
 }
 
+/// A custom button widget.
 class CustomButton extends StatelessWidget {
   final Color color;
   final String title;
@@ -120,7 +125,7 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onTap;
 
   const CustomButton({
-    super.key,
+    Key? key,
     required this.color,
     required this.title,
     required this.description,

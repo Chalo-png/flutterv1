@@ -8,21 +8,36 @@ import 'package:test2/widgets/widget_practiceMode/practiceMode.dart';
 //Todas las notas del Piano
 var notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 //Solo en el PMV se considera la escala C
-var scales = [[0, 2, 4, 5, 7, 9, 11]];
+var scales = [
+  [0, 2, 4, 5, 7, 9, 11]
+];
 //Solo en PMV se consideran acordes mayores y menores
-var chords = [[0, 4, 7], [0, 3, 7]];
+var chords = [
+  [0, 4, 7],
+  [0, 3, 7]
+];
 //Solo en PMC se considera negra, blanca y redonda
 var duration = [1, 2, 4];
-var durationProb = [[0.1, 0.3, 0.6], [0.3, 0.4, 0.3], [0.7, 0.2, 0.1]];
+var durationProb = [
+  [0.1, 0.3, 0.6],
+  [0.3, 0.4, 0.3],
+  [0.7, 0.2, 0.1]
+];
 var chordDurarion = [2, 4];
 //Progresión de acordes clasica
-var chordProggresion = [[0, 3, 4, 4], [0, 0, 3, 4], [0, 3, 0, 4], [0, 3, 4, 3]];
+var chordProggresion = [
+  [0, 3, 4, 4],
+  [0, 0, 3, 4],
+  [0, 3, 0, 4],
+  [0, 3, 4, 3]
+];
 
-
+/// Class that displays the generated music sheet, and allows the user to practice it.
 class GeneratorDisplayScreen extends StatefulWidget {
   @override
   _DifficultyPageState createState() => _DifficultyPageState();
 }
+
 class _DifficultyPageState extends State<GeneratorDisplayScreen> {
   AudioPlayer _audioPlayer = AudioPlayer();
   var _notesToPlay = [];
@@ -33,121 +48,127 @@ class _DifficultyPageState extends State<GeneratorDisplayScreen> {
   List<Note> generatedNotes = [];
   bool clicked = false;
   var _data = [];
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Generar melodia"),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                DifficultyButton(
-                  text: 'Fácil',
-                  color: Colors.green,
-                  isSelected: selectedDifficulty == 'Fácil',
-                  onTap: () {
-                    setState(() {
-                      selectedDifficulty = 'Fácil';
-                    });
-                  },
-                ),
-                DifficultyButton(
-                  text: 'Medio',
-                  color: Colors.orange,
-                  isSelected: selectedDifficulty == 'Medio',
-                  onTap: () {
-                    setState(() {
-                      selectedDifficulty = 'Medio';
-                    });
-                  },
-                ),
-                DifficultyButton(
-                  text: 'Difícil',
-                  color: Colors.red,
-                  isSelected: selectedDifficulty == 'Difícil',
-                  onTap: () {
-                    setState(() {
-                      selectedDifficulty = 'Difícil';
-                    });
-                  },
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    generatedNotes = convertToMusicObjects();
-                    setState(() {
-                      clicked = true;
-                      resetCreation();
-                    });
-                  },
-                  child: Text('Confirmar'),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              color: Colors.grey[300],
-              padding: EdgeInsets.all(20.0),
-              alignment: Alignment.center,
-              child: resetCreation(),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: clicked? Colors.green: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-            ),
-            onPressed: () {
-              if(generatedNotes.length!=0){
-                _isPlaying = false;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MusicSheetDisplayScreenPracticeMode(notes: generatedNotes),
+        appBar: AppBar(
+          title: const Text("Generar melodia"),
+        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  DifficultyButton(
+                    text: 'Fácil',
+                    color: Colors.green,
+                    isSelected: selectedDifficulty == 'Fácil',
+                    onTap: () {
+                      setState(() {
+                        selectedDifficulty = 'Fácil';
+                      });
+                    },
                   ),
-                );
-              }
-            },
-            child: Text('¡Practicar!'),
-          ),
-        ],
-      )
-    );
+                  DifficultyButton(
+                    text: 'Medio',
+                    color: Colors.orange,
+                    isSelected: selectedDifficulty == 'Medio',
+                    onTap: () {
+                      setState(() {
+                        selectedDifficulty = 'Medio';
+                      });
+                    },
+                  ),
+                  DifficultyButton(
+                    text: 'Difícil',
+                    color: Colors.red,
+                    isSelected: selectedDifficulty == 'Difícil',
+                    onTap: () {
+                      setState(() {
+                        selectedDifficulty = 'Difícil';
+                      });
+                    },
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      generatedNotes = convertToMusicObjects();
+                      setState(() {
+                        clicked = true;
+                        resetCreation();
+                      });
+                    },
+                    child: Text('Confirmar'),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Container(
+                color: Colors.grey[300],
+                padding: EdgeInsets.all(20.0),
+                alignment: Alignment.center,
+                child: resetCreation(),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: clicked ? Colors.green : Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+              ),
+              onPressed: () {
+                if (generatedNotes.length != 0) {
+                  _isPlaying = false;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MusicSheetDisplayScreenPracticeMode(
+                          notes: generatedNotes),
+                    ),
+                  );
+                }
+              },
+              child: Text('¡Practicar!'),
+            ),
+          ],
+        ));
   }
+
   Future<void> playNotes(var notes) async {
-    if(notes!=_notesToPlay){
+    if (notes != _notesToPlay) {
       _notesToPlay = notes;
       // Detener la reproducción actual si está en curso
       await stop();
       await Future.delayed(Duration(milliseconds: 500));
-      if(notes==_notesToPlay){
+      if (notes == _notesToPlay) {
         _currentIndex = 0;
         _isPlaying = true;
         await _playNextNote();
       }
     }
   }
+
   Future<void> _playNextNote() async {
     print(_notesToPlay);
     for (var currentNote in _notesToPlay) {
-      if(_isPlaying){
-        String soundPath = '${currentNote['note']}.mp3'; // Ruta al archivo de sonido
+      if (_isPlaying) {
+        String soundPath =
+            '${currentNote['note']}.mp3'; // Ruta al archivo de sonido
 
         try {
-          await _audioPlayer.play(AssetSource(soundPath)); // Reproducir el sonido
-          await Future.delayed(Duration(seconds: currentNote['duration'])); // Esperar la duración de la nota
+          await _audioPlayer
+              .play(AssetSource(soundPath)); // Reproducir el sonido
+          await Future.delayed(Duration(
+              seconds:
+                  currentNote['duration'])); // Esperar la duración de la nota
           await _audioPlayer.release();
         } catch (e) {
-          print(e); 
+          print(e);
         }
-      }else{
+      } else {
         break;
       }
     }
@@ -177,53 +198,70 @@ class _DifficultyPageState extends State<GeneratorDisplayScreen> {
     _isPlaying = false;
     _currentIndex = 0;
   }
-  Widget resetCreation(){
+
+  Widget resetCreation() {
     _audioPlayer.setReleaseMode(ReleaseMode.release);
-    var creation =  generatedNotes.isEmpty ? const Text("Selecciona una dificultad para crear una canción!") : MusicSheetWidget(notes: generatedNotes,);
+    var creation = generatedNotes.isEmpty
+        ? const Text("Selecciona una dificultad para crear una canción!")
+        : MusicSheetWidget(
+            notes: generatedNotes,
+          );
     playNotes(_data);
     return creation;
   }
+
   @override
-  void dispose(){
+  void dispose() {
     _audioPlayer.stop();
     _audioPlayer.dispose();
     super.dispose();
   }
+
   List<Map<String, dynamic>> generateNotesData() {
     int compassAmount = 4; //Numero de compases de la partitura a generar
     int compassDuration = 4; //Numero de tiempos dentro de cada compas
     var data = <Map<String, dynamic>>[]; //Datos a devolver
     final rand = Random(); //Random
-    var selectedScale = scales[rand.nextInt(scales.length)]; //Escala elegida al azar
-    var selectedNotes = selectedScale.map((idx)=> notes[idx]).toList(); //Notas que corresponden a esa escala
-    var selectedProgression = chordProggresion[rand.nextInt(chordProggresion.length)]; //Progresion elegida al azar
-    int diff = selectedDifficulty == 'Fácil' ? 0 : selectedDifficulty=='Medio' ? 1 : 2; //Dificultad en valor entero
+    var selectedScale =
+        scales[rand.nextInt(scales.length)]; //Escala elegida al azar
+    var selectedNotes = selectedScale
+        .map((idx) => notes[idx])
+        .toList(); //Notas que corresponden a esa escala
+    var selectedProgression = chordProggresion[
+        rand.nextInt(chordProggresion.length)]; //Progresion elegida al azar
+    int diff = selectedDifficulty == 'Fácil'
+        ? 0
+        : selectedDifficulty == 'Medio'
+            ? 1
+            : 2; //Dificultad en valor entero
     for (var i = 0; i < compassAmount; i++) {
       int localCompass = compassDuration; //Contador de tiempos del compas local
-      int localProgression = selectedProgression[i % selectedProgression.length]; //Nota base del compas local (Nota Corazón)
-      while (localCompass!=0){ 
+      int localProgression = selectedProgression[i %
+          selectedProgression
+              .length]; //Nota base del compas local (Nota Corazón)
+      while (localCompass != 0) {
         final r = Random(); //Random
         String note; //Nota (o notas) local
         int localDuration = 5; //Duración de la nota actual
         bool isChord = false; //Transformar nota actual en acorde?
-        //(r.nextInt(10) < diff*2)&&(localCompass>1); 
+        //(r.nextInt(10) < diff*2)&&(localCompass>1);
         do {
-          if(isChord){
+          if (isChord) {
             localDuration = chordDurarion[r.nextInt(chordDurarion.length)];
-          }else{
+          } else {
             var localProb = durationProb[diff];
             var randDouble = r.nextDouble();
             double counter = 0.0;
             for (var j = 0; j < localProb.length; j++) {
               counter += localProb[j];
-              if(counter>=randDouble){    
+              if (counter >= randDouble) {
                 localDuration = duration[j];
                 break;
               }
             }
           }
-        } while (localCompass-localDuration<0);
-        note = selectedNotes[localProgression + r.nextInt(3)]+"4";
+        } while (localCompass - localDuration < 0);
+        note = selectedNotes[localProgression + r.nextInt(3)] + "4";
         /*
         if(!isChord){
           note = selectedNotes[localProgression + r.nextInt(3)]+"4";
@@ -235,7 +273,7 @@ class _DifficultyPageState extends State<GeneratorDisplayScreen> {
           'duration': localDuration,
         };
         data.add(localNote);
-        localCompass-=localDuration;
+        localCompass -= localDuration;
       }
     }
     _data = data;
@@ -304,13 +342,18 @@ class _DifficultyPageState extends State<GeneratorDisplayScreen> {
     }
   }
 }
+
 class DifficultyButton extends StatelessWidget {
   final String text;
   final Color color;
   final bool isSelected;
   final VoidCallback onTap;
 
-  DifficultyButton({required this.text, required this.color, required this.isSelected, required this.onTap});
+  DifficultyButton(
+      {required this.text,
+      required this.color,
+      required this.isSelected,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -326,7 +369,8 @@ class DifficultyButton extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: TextStyle(fontSize: 20, color: isSelected ? Colors.white : Colors.black),
+          style: TextStyle(
+              fontSize: 20, color: isSelected ? Colors.white : Colors.black),
         ),
       ),
     );

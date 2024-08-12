@@ -1,6 +1,7 @@
-
+/// Represents a PracticaM object.
+///
+/// It stores information about a practice session, such as the song ID, the number of correct answers, the success rate, the song speed, how the user felt during the practice, and the time it took to complete the practice.
 class PracticaM {
-
   int songId;
   int cantAciertos;
   double tasaAciertos;
@@ -8,6 +9,7 @@ class PracticaM {
   String sentimiento;
   int secondsToComplete;
 
+  /// Constructs a PracticaM object.
   PracticaM({
     required this.songId,
     required this.cantAciertos,
@@ -17,7 +19,7 @@ class PracticaM {
     required this.secondsToComplete,
   });
 
-  // Convert a PracticaM object into a JSON object
+  /// Converts a PracticaM object into a JSON object.
   Map<String, dynamic> toJson() {
     return {
       'song_id': songId,
@@ -29,7 +31,7 @@ class PracticaM {
     };
   }
 
-  // Create a PracticaM object from a JSON object
+  /// Creates a PracticaM object from a JSON object.
   factory PracticaM.fromJson(Map<String, dynamic> json) {
     return PracticaM(
       songId: json['song_id'],

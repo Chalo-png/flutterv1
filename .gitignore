@@ -31,7 +31,7 @@ lib/chatbot/consts.dart
 .pub-cache/
 .pub/
 /build/
-
+/doc/
 # Symbolication related
 app.*.symbols
 

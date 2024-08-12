@@ -6,71 +6,28 @@ import '../widgets/widget_musicSheet/MusicSheetWidget.dart';
 import '../widgets/widget_musicSheet/src/music_objects/note/note.dart';
 
 final List<Note> estrellitaNotas = [
-  const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.quarter
-  ),
+  const Note(pitch: Pitch.c4, noteDuration: NoteDuration.quarter),
   // Más notas
 ];
 
 final List<Note> testSong2 = [
-  const Note(
-      pitch: Pitch.e4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.e4,
-      noteDuration: NoteDuration.quarter
-  ),
+  const Note(pitch: Pitch.e4, noteDuration: NoteDuration.quarter),
+  const Note(pitch: Pitch.c4, noteDuration: NoteDuration.quarter),
+  const Note(pitch: Pitch.e4, noteDuration: NoteDuration.quarter),
   // Más notas
 ];
 
-
 final List<Note> runRunNotas = [
-  const Note(
-      pitch: Pitch.e4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.d4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.b4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.g4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.d4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.a4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.quarter
-  ),
-  const Note(
-      pitch: Pitch.a4,
-      noteDuration: NoteDuration.quarter
-  ),
+  const Note(pitch: Pitch.e4, noteDuration: NoteDuration.quarter),
+  const Note(pitch: Pitch.c4, noteDuration: NoteDuration.quarter),
+  const Note(pitch: Pitch.d4, noteDuration: NoteDuration.quarter),
+  const Note(pitch: Pitch.b4, noteDuration: NoteDuration.quarter),
+  const Note(pitch: Pitch.g4, noteDuration: NoteDuration.quarter),
+  const Note(pitch: Pitch.d4, noteDuration: NoteDuration.quarter),
+  const Note(pitch: Pitch.c4, noteDuration: NoteDuration.quarter),
+  const Note(pitch: Pitch.a4, noteDuration: NoteDuration.quarter),
+  const Note(pitch: Pitch.c4, noteDuration: NoteDuration.quarter),
+  const Note(pitch: Pitch.a4, noteDuration: NoteDuration.quarter),
 ];
 
 final List<Note> testSong = [
@@ -137,19 +94,14 @@ final List<Note> testSong = [
 ];
 
 final List<Note> memoriesNotas = [
-  const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.quarter
-  ),
+  const Note(pitch: Pitch.c4, noteDuration: NoteDuration.quarter),
 ];
 
 final List<Note> driveByNotas = [
-  const Note(
-      pitch: Pitch.c4,
-      noteDuration: NoteDuration.quarter
-  ),
+  const Note(pitch: Pitch.c4, noteDuration: NoteDuration.quarter),
 ];
 
+/// Represents a song with its properties such as id, title, genre, difficulty, duration, and notes.
 class Cancion {
   final int id;
   final String titulo;
@@ -168,19 +120,57 @@ class Cancion {
   });
 }
 
+/// Represents a stateful widget that displays a list of preloaded songs.
 class CancionesPrecargadas extends StatefulWidget {
   @override
   _CancionesPrecargadasState createState() => _CancionesPrecargadasState();
 }
 
+/// Represents the state of the [CancionesPrecargadas] widget.
 class _CancionesPrecargadasState extends State<CancionesPrecargadas> {
   final List<Cancion> _canciones = [
-    Cancion(id:1, titulo: 'Estrellita donde estas', genero: 'Infantil', dificultad: 1, duracion: '3 m', notas: estrellitaNotas),
-    Cancion(id:2, titulo: 'Run run se fue pal norte', genero: 'Folclor', dificultad: 2, duracion: '3 m 23 s', notas: runRunNotas),
-    Cancion(id:3, titulo: 'Memories', genero: 'Infantil', dificultad: 2, duracion: '3 m 40 s', notas: memoriesNotas),
-    Cancion(id:4, titulo: 'Drive by', genero: 'Soul', dificultad: 3, duracion: '3 m', notas: driveByNotas),
-    Cancion(id:5, titulo: 'Test Song', genero: 'Test', dificultad: 5, duracion: '2 m', notas: testSong),
-    Cancion(id:5, titulo: 'Test Song2', genero: 'Test', dificultad: 5, duracion: '2 m', notas: testSong2),
+    Cancion(
+        id: 1,
+        titulo: 'Estrellita donde estas',
+        genero: 'Infantil',
+        dificultad: 1,
+        duracion: '3 m',
+        notas: estrellitaNotas),
+    Cancion(
+        id: 2,
+        titulo: 'Run run se fue pal norte',
+        genero: 'Folclor',
+        dificultad: 2,
+        duracion: '3 m 23 s',
+        notas: runRunNotas),
+    Cancion(
+        id: 3,
+        titulo: 'Memories',
+        genero: 'Infantil',
+        dificultad: 2,
+        duracion: '3 m 40 s',
+        notas: memoriesNotas),
+    Cancion(
+        id: 4,
+        titulo: 'Drive by',
+        genero: 'Soul',
+        dificultad: 3,
+        duracion: '3 m',
+        notas: driveByNotas),
+    Cancion(
+        id: 5,
+        titulo: 'Test Song',
+        genero: 'Test',
+        dificultad: 5,
+        duracion: '2 m',
+        notas: testSong),
+    Cancion(
+        id: 5,
+        titulo: 'Test Song2',
+        genero: 'Test',
+        dificultad: 5,
+        duracion: '2 m',
+        notas: testSong2),
   ];
 
   @override
@@ -209,7 +199,8 @@ class _CancionesPrecargadasState extends State<CancionesPrecargadas> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MusicSheetDisplayScreenPracticeMode(notes: cancion.notas, songId: cancion.id),
+                  builder: (context) => MusicSheetDisplayScreenPracticeMode(
+                      notes: cancion.notas, songId: cancion.id),
                 ),
               );
             },

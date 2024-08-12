@@ -6,8 +6,11 @@ import '../../models/leccionM.dart';
 import 'package:test2/models/user.dart';
 import 'package:test2/chatbot/chatbot_emociones.dart';
 import "package:test2/chatbot/chatbot_tutorial.dart";
+
+/// Screen for Lesson 1.
 class Leccion1Screen extends StatelessWidget {
   const Leccion1Screen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,19 +18,22 @@ class Leccion1Screen extends StatelessWidget {
         title: const Text('Lección 1 - Sonido y Silencio'),
       ),
       body:
-          const ModoTeorico(), // Mostrar el modo teórico al inicio de la lección
+          const ModoTeorico(), // Show the theoretical mode at the beginning of the lesson
     );
   }
 }
 
+/// Stateful widget for the theoretical mode.
 class ModoTeorico extends StatefulWidget {
   const ModoTeorico({super.key});
+
   @override
   ModoTeoricoState createState() => ModoTeoricoState();
 }
 
+/// State class for the theoretical mode.
 class ModoTeoricoState extends State<ModoTeorico> {
-  // Lista de pictogramas con sus respectivos datos (título, sonido y animación)
+  // List of pictograms with their respective data (title, sound, and animation)
   List<Pictograma> pictogramas = [
     Pictograma('vaca', 'vaca.mp3', 'vaca.png', 'vaca.gif'),
     Pictograma('dormir', '', 'dormir.png', 'dormir.gif'),
@@ -36,16 +42,16 @@ class ModoTeoricoState extends State<ModoTeorico> {
     Pictograma('cantar', 'cantar.mp3', 'cantar.png', 'cantar.gif'),
     Pictograma('meditar', '', 'meditar.png', 'meditar.gif'),
   ];
-  // Lista para rastrear si cada pictograma ha sido tocado
+  // List to track if each pictogram has been touched
   List<bool> tocado = [];
-  // Instancia de AudioPlayer para reproducir sonidos
+  // Instance of AudioPlayer to play sounds
   AudioPlayer audioPlayer = AudioPlayer();
 
   @override
   void initState() {
     super.initState();
     tocado = List<bool>.filled(pictogramas.length, false);
-    // Precarga los sonidos al iniciar la pantalla
+    // Preload sounds when the screen starts
     for (var pictograma in pictogramas) {
       if (pictograma.sonido.isNotEmpty) {
         precargarSonido(pictograma.sonido);
@@ -53,7 +59,7 @@ class ModoTeoricoState extends State<ModoTeorico> {
     }
   }
 
-  // Método para precargar un sonido
+  /// Method to preload a sound.
   void precargarSonido(String assetPath) {
     audioPlayer.setSourceAsset(assetPath);
   }
@@ -61,7 +67,7 @@ class ModoTeoricoState extends State<ModoTeorico> {
   @override
   void dispose() {
     audioPlayer
-        .dispose(); // Libera los recursos del AudioPlayer al cerrar la pantalla
+        .dispose(); // Release AudioPlayer resources when closing the screen
     super.dispose();
   }
 
@@ -73,68 +79,70 @@ class ModoTeoricoState extends State<ModoTeorico> {
         Expanded(
           flex: 3,
           child: GridView.builder(
-          padding: const EdgeInsets.all(16.0),
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200, // Ajusta este valor según tus necesidades
-            crossAxisSpacing: 16.0,
-            mainAxisSpacing: 16.0,
-          ),
-          itemCount: pictogramas.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  tocado[index] = true; // Marcar la tarjeta como tocada
-                });
-                reproducirSonido(index);
-                mostrarAnimacion(context, index);
-              },
-              child: Card(
-                color: tocado[index] ? Colors.green : Colors.white,
-                elevation: 4.0,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/${pictogramas[index].imagen}',
-                      height: 100,
-                      width: 100,
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                      pictogramas[index].titulo,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
+            padding: const EdgeInsets.all(16.0),
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent:
+                  200, // Adjust this value according to your needs
+              crossAxisSpacing: 16.0,
+              mainAxisSpacing: 16.0,
+            ),
+            itemCount: pictogramas.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    tocado[index] = true; // Mark the card as touched
+                  });
+                  reproducirSonido(index);
+                  mostrarAnimacion(context, index);
+                },
+                child: Card(
+                  color: tocado[index] ? Colors.green : Colors.white,
+                  elevation: 4.0,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/${pictogramas[index].imagen}',
+                        height: 100,
+                        width: 100,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 8.0),
+                      Text(
+                        pictogramas[index].titulo,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
-        )
-      ),
-      Expanded(
-        child: Container(
-          padding: const EdgeInsets.only(left: 16.0), // Espacio a la izquierda
-          alignment: Alignment.center,
-          child: Chatbot_Leccion1(tipo: 0), // Instancia de la clase Chatbot_Tutorial
+              );
+            },
+          ),
         ),
-      ),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.only(left: 16.0), // Space on the left
+            alignment: Alignment.center,
+            child: Chatbot_Leccion1(
+                tipo: 0), // Instance of the Chatbot_Tutorial class
+          ),
+        ),
       ],
-    );      
+    );
   }
 
-  // Método para reproducir el sonido correspondiente al pictograma
+  /// Method to play the sound corresponding to the pictogram.
   void reproducirSonido(int index) async {
     if (pictogramas[index].sonido.isNotEmpty) {
       await audioPlayer.play(AssetSource(pictogramas[index].sonido));
     }
   }
 
-  // Método para mostrar la animación correspondiente al pictograma
+  /// Method to show the animation corresponding to the pictogram.
   void mostrarAnimacion(BuildContext context, int index) {
     if (pictogramas[index].animacion.isNotEmpty) {
       showDialog(
@@ -161,12 +169,15 @@ class ModoTeoricoState extends State<ModoTeorico> {
   }
 }
 
+/// Screen for congratulations.
 class FelicidadesScreen extends StatefulWidget {
   const FelicidadesScreen({super.key});
+
   @override
   FelicidadesScreenState createState() => FelicidadesScreenState();
 }
 
+/// State class for the congratulations screen.
 class FelicidadesScreenState extends State<FelicidadesScreen> {
   AudioPlayer audioPlayer = AudioPlayer();
 
@@ -176,6 +187,7 @@ class FelicidadesScreenState extends State<FelicidadesScreen> {
     reproducirSonido();
   }
 
+  /// Method to play the sound.
   void reproducirSonido() async {
     await audioPlayer.play(AssetSource('acertar.mp3'));
   }
@@ -219,12 +231,15 @@ class FelicidadesScreenState extends State<FelicidadesScreen> {
   }
 }
 
+/// A screen widget for classifying images as with sound or without sound.
 class ClasificacionScreen extends StatefulWidget {
   const ClasificacionScreen({super.key});
+
   @override
   ClasificacionScreenState createState() => ClasificacionScreenState();
 }
 
+/// The state class for the ClasificacionScreen widget.
 class ClasificacionScreenState extends State<ClasificacionScreen> {
   Chatbot_Leccion1 mibot = Chatbot_Leccion1(tipo: 1);
   Chatbot_Leccion1 mibot2 = Chatbot_Leccion1(tipo: 2);
@@ -243,167 +258,167 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
   AudioPlayer audioPlayer = AudioPlayer();
   AudioPlayer audioPlayer2 = AudioPlayer();
 
-@override
-Widget build(BuildContext context) {
-  final screenHeight = MediaQuery.of(context).size.height;
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text('Clasificar Imágenes - Sonoras o Silenciosas'),
-    ),
-    body: Column(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(
-                child: DragTarget<ImagenClasificacion>(
-                  builder: (context, candidateData, rejectedData) {
-                    return Container(
-                      height: screenHeight / 2,
-                      color: Colors.blue.shade100,
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: double.infinity,
-                            child: Text(
-                              'Sonoras',
-                              style: TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.bold,
+  @override
+  Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Clasificar Imágenes - Sonoras o Silenciosas'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: DragTarget<ImagenClasificacion>(
+                    builder: (context, candidateData, rejectedData) {
+                      return Container(
+                        height: screenHeight / 2,
+                        color: Colors.blue.shade100,
+                        child: Wrap(
+                          alignment: WrapAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                'Sonoras',
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
                             ),
-                          ),
-                          ...sonoras.map((e) => buildPictograma(e)),
-                        ],
-                      ),
-                    );
-                  },
-                  onAcceptWithDetails: (DragTargetDetails<dynamic> details) {
-                    final data = details.data;
-                    setState(() {
-                      if (data.esSonora) {
-                        sonoras.add(data);
-                        reproducirSonido('acertar.mp3').then((_) {
-                          setState(() {
-                            imagenes.remove(data);
-                            checkTermination(context);
+                            ...sonoras.map((e) => buildPictograma(e)),
+                          ],
+                        ),
+                      );
+                    },
+                    onAcceptWithDetails: (DragTargetDetails<dynamic> details) {
+                      final data = details.data;
+                      setState(() {
+                        if (data.esSonora) {
+                          sonoras.add(data);
+                          reproducirSonido('acertar.mp3').then((_) {
+                            setState(() {
+                              imagenes.remove(data);
+                              checkTermination(context);
+                            });
                           });
-                        });
-                      } else {
-                        reproducirSonido('equivocarse.mp3');
-                        equivocarse++;
-                        if (equivocarse == 3) {
-                          // Reiniciar el contador y cambiar el tipo del chatbot
-                          equivocarse = 0;
-                          setState(() {
-                            mibot = Chatbot_Leccion1(tipo: 2);
-                          });
+                        } else {
+                          reproducirSonido('equivocarse.mp3');
+                          equivocarse++;
+                          if (equivocarse == 3) {
+                            // Reiniciar el contador y cambiar el tipo del chatbot
+                            equivocarse = 0;
+                            setState(() {
+                              mibot = Chatbot_Leccion1(tipo: 2);
+                            });
+                          }
                         }
-                      }
-                      checkTermination(context);
-                    });
-                  },
-                ),
-              ),
-              Expanded(
-                child: DragTarget<ImagenClasificacion>(
-                  builder: (context, candidateData, rejectedData) {
-                    return Container(
-                      height: screenHeight / 2,
-                      color: Colors.red.shade100,
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: double.infinity,
-                            child: Text(
-                              'Silenciosas',
-                              style: TextStyle(
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          ...silenciosas.map((e) => buildPictograma(e)),
-                        ],
-                      ),
-                    );
-                  },
-                  onAcceptWithDetails: (DragTargetDetails<dynamic> details) {
-                    final data = details.data;
-                    setState(() {
-                      if (!data.esSonora) {
-                        silenciosas.add(data);
-                        reproducirSonido('acertar.mp3').then((_) {
-                          setState(() {
-                            imagenes.remove(data);
-                            checkTermination(context);
-                          });
-                        });
-                      } else {
-                        reproducirSonido('equivocarse.mp3');
-                        equivocarse++;
-                        if (equivocarse == 3) {
-                          // Reiniciar el contador y cambiar el tipo del chatbot
-                          equivocarse = 0;
-                          setState(() {
-                            mibot = Chatbot_Leccion1(tipo: 2);
-                          });
-                          
-                        }
-                      }
-                      checkTermination(context);
-                    });
-                  },
-                ),
-              ),
-              Expanded(
-                flex: 1, // Ajusta el tamaño del espacio para el chatbot
-                child: Container(
-                  padding: const EdgeInsets.only(left: 16.0),
-                  alignment: Alignment.center,
-                  child: mibot,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.only(right: 16.0),
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 200,
-              crossAxisSpacing: 16.0,
-              mainAxisSpacing: 16.0,
-            ),
-            itemCount: imagenes.length,
-            itemBuilder: (context, index) {
-              return Draggable<ImagenClasificacion>(
-                data: imagenes[index],
-                feedback: Material(
-                  child: Opacity(
-                    opacity: 0.7,
-                    child: buildPictograma(imagenes[index]),
+                        checkTermination(context);
+                      });
+                    },
                   ),
                 ),
-                childWhenDragging: Container(),
-                child: Card(
-                  elevation: 4.0,
-                  color: Colors.white,
-                  child: buildPictograma(imagenes[index]),
+                Expanded(
+                  child: DragTarget<ImagenClasificacion>(
+                    builder: (context, candidateData, rejectedData) {
+                      return Container(
+                        height: screenHeight / 2,
+                        color: Colors.red.shade100,
+                        child: Wrap(
+                          alignment: WrapAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                'Silenciosas',
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            ...silenciosas.map((e) => buildPictograma(e)),
+                          ],
+                        ),
+                      );
+                    },
+                    onAcceptWithDetails: (DragTargetDetails<dynamic> details) {
+                      final data = details.data;
+                      setState(() {
+                        if (!data.esSonora) {
+                          silenciosas.add(data);
+                          reproducirSonido('acertar.mp3').then((_) {
+                            setState(() {
+                              imagenes.remove(data);
+                              checkTermination(context);
+                            });
+                          });
+                        } else {
+                          reproducirSonido('equivocarse.mp3');
+                          equivocarse++;
+                          if (equivocarse == 3) {
+                            // Reiniciar el contador y cambiar el tipo del chatbot
+                            equivocarse = 0;
+                            setState(() {
+                              mibot = Chatbot_Leccion1(tipo: 2);
+                            });
+                          }
+                        }
+                        checkTermination(context);
+                      });
+                    },
+                  ),
                 ),
-              );
-            },
+                Expanded(
+                  flex: 1, // Ajusta el tamaño del espacio para el chatbot
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    alignment: Alignment.center,
+                    child: mibot,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.only(right: 16.0),
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 200,
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
+              ),
+              itemCount: imagenes.length,
+              itemBuilder: (context, index) {
+                return Draggable<ImagenClasificacion>(
+                  data: imagenes[index],
+                  feedback: Material(
+                    child: Opacity(
+                      opacity: 0.7,
+                      child: buildPictograma(imagenes[index]),
+                    ),
+                  ),
+                  childWhenDragging: Container(),
+                  child: Card(
+                    elevation: 4.0,
+                    color: Colors.white,
+                    child: buildPictograma(imagenes[index]),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  /// Builds a pictograma widget for the given [imagenClasificacion].
   Widget buildPictograma(ImagenClasificacion imagenClasificacion) {
     return Container(
       color: Colors.white, // Fondo blanco
@@ -429,9 +444,8 @@ Widget build(BuildContext context) {
     );
   }
 
-  // Función para cambiar el tipo del chatbot
-  
-  Future reproducirSonido(String assetPath) async {
+  /// Plays the sound specified by the given [assetPath].
+  Future<void> reproducirSonido(String assetPath) async {
     if (audioPlayer.state != PlayerState.playing) {
       await audioPlayer.play(AssetSource(assetPath));
     } else {
@@ -439,6 +453,7 @@ Widget build(BuildContext context) {
     }
   }
 
+  /// Checks if the termination condition is met and navigates to the FelicidadesFinalScreen.
   void checkTermination(BuildContext context) {
     Future.delayed(const Duration(seconds: 1));
     if (imagenes.isEmpty) {
@@ -518,7 +533,8 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const ChatbotEmocionesFinalScreen()),
+                      builder: (context) =>
+                          const ChatbotEmocionesFinalScreen()),
                 );
               },
               child: const Text('Continuar'),
@@ -530,13 +546,16 @@ class FelicidadesFinalScreenState extends State<FelicidadesFinalScreen> {
   }
 }
 
+/// Screen for the final step of the Emotions Chatbot.
 class ChatbotEmocionesFinalScreen extends StatefulWidget {
   const ChatbotEmocionesFinalScreen({super.key});
+
   @override
   ChatbotEmocionesFinalScreenState createState() =>
       ChatbotEmocionesFinalScreenState();
 }
 
+/// State class for the ChatbotEmocionesFinalScreen.
 class ChatbotEmocionesFinalScreenState
     extends State<ChatbotEmocionesFinalScreen> {
   String sentimiento = "default";
@@ -545,8 +564,11 @@ class ChatbotEmocionesFinalScreenState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // TODO: Add any necessary initialization logic here
     });
   }
+
+  /// Handles the save operation.
   Future<void> _handleSave() async {
     List<LeccionM> currLeccion = setupLeccion(1, true, sentimiento);
     String email = "user@example.com";
@@ -554,21 +576,33 @@ class ChatbotEmocionesFinalScreenState
     String userType = "Alumno";
     int edad = 5;
     User currUser =
-    setupLeccionforsave(currLeccion, 2, email, password, userType, edad);
+        setupLeccionforsave(currLeccion, 2, email, password, userType, edad);
     storeUser(currUser);
   }
-  List<LeccionM> setupLeccion(int leccionId, bool completed, String sentimiento) {
+
+  /// Sets up a LeccionM object.
+  List<LeccionM> setupLeccion(
+      int leccionId, bool completed, String sentimiento) {
     LeccionM leccion = LeccionM(
-        leccionId: leccionId,
-        completed: completed,
-        sentimiento: sentimiento);
+      leccionId: leccionId,
+      completed: completed,
+      sentimiento: sentimiento,
+    );
 
     List<LeccionM> leccionList = [];
     leccionList.add(leccion);
     return leccionList;
   }
-  User setupLeccionforsave(List<LeccionM> lecciones, int userId, String email,
-      String password, String userType, int edad) {
+
+  /// Sets up a User object for saving.
+  User setupLeccionforsave(
+    List<LeccionM> lecciones,
+    int userId,
+    String email,
+    String password,
+    String userType,
+    int edad,
+  ) {
     User user = User(
       id: userId,
       email: email,
@@ -580,6 +614,8 @@ class ChatbotEmocionesFinalScreenState
 
     return user;
   }
+
+  /// Updates the [sentimiento] and handles the save operation.
   void updateSentimiento(String newSentimiento) {
     setState(() {
       sentimiento = newSentimiento;
@@ -602,12 +638,14 @@ class ChatbotEmocionesFinalScreenState
               onSentimientoSelected: updateSentimiento,
             ),
             ElevatedButton(
-              onPressed: sentimiento == "default" ? null : () {
-                Navigator.popUntil(
-                  context,
-                  ModalRoute.withName('/'),
-                );
-              },
+              onPressed: sentimiento == "default"
+                  ? null
+                  : () {
+                      Navigator.popUntil(
+                        context,
+                        ModalRoute.withName('/'),
+                      );
+                    },
               child: const Text('Volver al menu principal'),
             ),
           ],
@@ -617,20 +655,35 @@ class ChatbotEmocionesFinalScreenState
   }
 }
 
+/// Represents an image classification.
 class ImagenClasificacion {
+  /// The title of the image classification.
   final String titulo;
+
+  /// The image URL of the image classification.
   final String imagen;
+
+  /// Indicates whether the image classification has sound.
   final bool esSonora;
 
+  /// Creates a new instance of the [ImagenClasificacion] class.
   ImagenClasificacion(this.titulo, this.imagen, this.esSonora);
 }
 
+/// Represents a pictogram.
 class Pictograma {
+  /// The title of the pictogram.
   final String titulo;
+
+  /// The sound URL of the pictogram.
   final String sonido;
+
+  /// The image URL of the pictogram.
   final String imagen;
+
+  /// The animation URL of the pictogram.
   final String animacion;
 
+  /// Creates a new instance of the [Pictograma] class.
   Pictograma(this.titulo, this.sonido, this.imagen, this.animacion);
 }
-
