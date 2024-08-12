@@ -249,6 +249,14 @@ List<String> Guia = [
                       width: MediaQuery.of(context).size.width * 0.3, // 40% del ancho de la pantalla
                       height: MediaQuery.of(context).size.height * 0.5, // 30% del alto de la pantalla
                       child: Image.asset(
+                        'assets/chatbot_camaleon_color_final.png',
+                        fit: BoxFit.contain, // Ajusta el tamaño de la imagen para que quepa en el contenedor
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.3, // 40% del ancho de la pantalla
+                      height: MediaQuery.of(context).size.height * 0.5, // 30% del alto de la pantalla
+                      child: Image.asset(
                         'assets/chatbot_camaleon_color_habla_final.png',
                         fit: BoxFit.contain, // Ajusta el tamaño de la imagen para que quepa en el contenedor
                       ),
