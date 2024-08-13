@@ -3,6 +3,7 @@ import 'package:test2/models/practicaM.dart';
 
 import 'leccionM.dart';
 
+/// Represents a user in the application.
 class User {
   final int id;
   final String email;
@@ -22,6 +23,7 @@ class User {
     this.lecciones,
   });
 
+  /// Converts the user object to a JSON map.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -34,6 +36,7 @@ class User {
     };
   }
 
+  /// Creates a user object from a JSON map.
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
@@ -51,6 +54,7 @@ class User {
   }
 }
 
+/// Stores the user data in Firestore.
 Future<void> storeUser(User user) async {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final userDoc = firestore.collection('users').doc(user.id.toString());
@@ -96,6 +100,7 @@ Future<void> storeUser(User user) async {
   }
 }
 
+/// Retrieves the age of a user by their ID.
 Future<int?> getUserEdadById(int userId) async {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final userDoc = firestore.collection('users').doc(userId.toString());
