@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:test2/chatbot/chatbot_leccion1.dart';
-import 'package:test2/rutas/lecciones/pictograma.dart';
-import '../../chatbot/emociones.dart';
-import '../../models/leccionM.dart';
-import 'package:test2/models/user.dart';
-import 'package:test2/chatbot/chatbot_emociones.dart';
-import "package:test2/chatbot/chatbot_tutorial.dart";
+import 'package:test2/rutas/paginasIntermediasLecciones/comotesientes.dart';
+import 'package:test2/rutas/paginasIntermediasLecciones/felicidadesPractica.dart';
+import 'package:test2/rutas/paginasIntermediasLecciones/felicidadesTeorico.dart';
 
-import 'ImageClasification.dart';
-import 'felicidadesFinalScreen.dart';
 
 /// Screen for Lesson 1.
 class Leccion1Screen extends StatelessWidget {
@@ -160,78 +155,29 @@ class ModoTeoricoState extends State<ModoTeorico> {
         ),
       ).then((value) {
         if (tocado.every((element) => element)) {
-          Future.delayed(const Duration(seconds: 1), () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const FelicidadesScreen()),
-            );
-          });
-        }
-      });
-    }
-  }
-}
-
-/// Screen for congratulations.
-class FelicidadesScreen extends StatefulWidget {
-  const FelicidadesScreen({super.key});
-
-  @override
-  FelicidadesScreenState createState() => FelicidadesScreenState();
-}
-
-/// State class for the congratulations screen.
-class FelicidadesScreenState extends State<FelicidadesScreen> {
-  AudioPlayer audioPlayer = AudioPlayer();
-
-  @override
-  void initState() {
-    super.initState();
-    reproducirSonido();
-  }
-
-  /// Method to play the sound.
-  void reproducirSonido() async {
-    await audioPlayer.play(AssetSource('acertar.mp3'));
-  }
-
-  @override
-  void dispose() {
-    audioPlayer.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Felicitaciones'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              '¡Felicitaciones por completar el modo teórico!',
-              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () {
+    Future.delayed(const Duration(seconds: 1), () {
+      // Check if the widget is still mounted before navigating
+      if (context.mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FelicidadesWidget(
+              mensaje: '¡Felicitaciones por completar el modo teórico de la Lección 1!',
+              onContinue: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const ClasificacionScreen()),
+                  MaterialPageRoute(builder: (context) => const ClasificacionScreen()),
                 );
               },
-              child: const Text('Continuar'),
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        );
+      }
+    });
+  }
+
+      });
+    }
   }
 }
 
@@ -462,12 +408,59 @@ class ClasificacionScreenState extends State<ClasificacionScreen> {
     Future.delayed(const Duration(seconds: 1));
     if (imagenes.isEmpty) {
       Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const FelicidadesFinalScreen()),
+              context,
+              MaterialPageRoute(
+                builder: (context) => FelicidadesFinalWidget(mensaje: '¡Felicidades, terminaste la lección 1!',
+                subMensaje: '¡Te has ganado una estrellita!', 
+                onContinue: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EmocionesFinalWidget(
+                          leccionId: 1, // Aquí pasas el ID de la lección actual
+                          onSaveComplete: () {
+                            //Se devuelve al menu principal
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                )
+              ),
       );
     }
   }
 }
 
+/// Represents an image classification.
+class ImagenClasificacion {
+  /// The title of the image classification.
+  final String titulo;
 
+  /// The image URL of the image classification.
+  final String imagen;
 
+  /// Indicates whether the image classification has sound.
+  final bool esSonora;
+
+  /// Creates a new instance of the [ImagenClasificacion] class.
+  ImagenClasificacion(this.titulo, this.imagen, this.esSonora);
+}
+
+/// Represents a pictogram.
+class Pictograma {
+  /// The title of the pictogram.
+  final String titulo;
+
+  /// The sound URL of the pictogram.
+  final String sonido;
+
+  /// The image URL of the pictogram.
+  final String imagen;
+
+  /// The animation URL of the pictogram.
+  final String animacion;
+
+  /// Creates a new instance of the [Pictograma] class.
+  Pictograma(this.titulo, this.sonido, this.imagen, this.animacion);
+}
