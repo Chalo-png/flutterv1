@@ -72,48 +72,56 @@ class LeccionesScreenState extends State<LeccionesScreen> {
         title: const Text('Lecciones'),
       ),
       backgroundColor: Colors.blue, // Fondo azul
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Container(
+        width: double.infinity, // Para que el Container ocupe todo el ancho disponible
+        padding: const EdgeInsets.all(16.0), // Padding general alrededor de los botones
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start, // Puedes ajustar esto según tus necesidades
           children: [
-            CustomButton(
-              color: Colors.red,
-              title: 'Lección 1 - Sonido y Silencio',
-              description:
-                  'Descubre el mundo de los sonidos y aprende a valorar el silencio.',
-              icon: leccion1Completada ? Icons.star : Icons.star_border,
-              onTap: () {
-                Navigator.pushNamed(context, '/leccion1');
-              },
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0), // Espacio debajo del botón
+              child: CustomButton(
+                color: Colors.red,
+                title: 'Lección 1 - Sonido y Silencio',
+                description:
+                    'Descubre el mundo de los sonidos y aprende a valorar el silencio.',
+                icon: leccion1Completada ? Icons.star : Icons.star_border,
+                onTap: () {
+                  Navigator.pushNamed(context, '/leccion1');
+                },
+              ),
             ),
-            const SizedBox(height: 16.0),
-            CustomButton(
-              color: Colors.orange,
-              title: 'Lección 2 - Pentagrama',
-              description: 'Explora el pentagrama y aprende a leer música.',
-              icon: Icons.star_border,
-              onTap: () {
-                Navigator.pushNamed(context, '/lecciones/leccion2',
-                    arguments: leccion1Completada);
-              },
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0), // Espacio debajo del botón
+              child: CustomButton(
+                color: Colors.orange,
+                title: 'Lección 2 - Pentagrama',
+                description: 'Explora el pentagrama y aprende a leer música.',
+                icon: Icons.star_border,
+                onTap: () {
+                  Navigator.pushNamed(context, '/lecciones/leccion2',
+                      arguments: leccion1Completada);
+                },
+              ),
             ),
-            const SizedBox(height: 16.0),
-            CustomButton(
-              color: Colors.yellow,
-              title: 'Lección 3 - Llave de Sol',
-              description:
-                  'Conoce la llave de sol y su importancia en la música.',
-              icon: Icons.star_border,
-              onTap: () {
-                Navigator.pushNamed(context, '/lecciones/leccion3');
-              },
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0), // Espacio debajo del botón
+              child: CustomButton(
+                color: Colors.yellow,
+                title: 'Lección 3 - Llave de Sol',
+                description:
+                    'Conoce la llave de sol y su importancia en la música.',
+                icon: Icons.star_border,
+                onTap: () {
+                  Navigator.pushNamed(context, '/lecciones/leccion3');
+                },
+              ),
             ),
           ],
         ),
       ),
     );
-  }
+  }  
 }
 
 /// A custom button widget.

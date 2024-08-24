@@ -39,24 +39,22 @@ class AnimatedCard extends StatelessWidget {
               width: 1,
             ), // optional border
           ),
-          child: Padding(
-            padding: const EdgeInsets.only(
-                left: 16.0, top: 5.0, right: 16.0, bottom: 10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                const SizedBox(height: 10.0),
-                Row(
-                  children: <Widget>[
-                    Icon(
-                      icon,
-                    ),
-                    Text(
-                      text,
-                      style: const TextStyle(fontSize: 14.0),
-                    ),
-                  ],
-                )
+                Icon(
+                  icon,
+                ),
+                const SizedBox(width: 8.0), // Adjust space between icon and text
+                Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: MediaQuery.of(context).size.width * 0.015,
+                  ),
+                ),
               ],
             ),
           ),

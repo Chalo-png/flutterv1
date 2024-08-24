@@ -50,28 +50,53 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter Piano App'),
+        title: const Text('Piano Colors'),
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth > 600) {
-            // Pantallas grandes (tablets, pantallas grandes)
-            return Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CustomButton(
+      body: Center(
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: MediaQuery.of(context).size.height * 0.9,
+          child: Column(
+            children: [
+              Expanded(
+                flex: 7, // 70% del espacio
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: IndexedStack(
+                        index: valor,
+                        children: [
+                          Chatbot_Tutorial(
+                            cambiarIndex: (nuevoValor) {
+                              setState(() {
+                                valor = nuevoValor;
+                              });
+                            },
+                          ),
+                          Chatbot(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 3, // 30% del espacio
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: CustomButton(
                         text: 'Práctica',
                         color: Colors.yellow,
                         onTap: () {
                           Navigator.pushNamed(context, '/cancionesPrecargadas');
                         },
                       ),
-                      CustomButton(
-                        text: 'Generar una melodía',
+                    ),
+                    Expanded(
+                      child: CustomButton(
+                        text: 'Generar',
                         color: Colors.red[200]!,
                         onTap: () {
                           Navigator.push(
@@ -81,106 +106,31 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       ),
-                      CustomButton(
+                    ),
+                    Expanded(
+                      child: CustomButton(
                         text: 'Lecciones',
-                        color: Colors.red[200]!,
+                        color: Colors.green[200]!,
                         onTap: () {
                           Navigator.pushNamed(context, '/lecciones');
                         },
                       ),
-                      CustomButton(
+                    ),
+                    Expanded(
+                      child: CustomButton(
                         text: 'Minijuegos',
                         color: Colors.blue[200]!,
                         onTap: () {
-                          // Navigate to Minijuegos Screen
+                          // Navegar a la pantalla de Minijuegos
                         },
                       ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: IndexedStack(
-                    index: valor,
-                    children: [
-                      Chatbot_Tutorial(
-                        cambiarIndex: (nuevoValor) {
-                          setState(() {
-                            valor = nuevoValor;
-                          });
-                        },
-                      ),
-                      Chatbot(),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          } else {
-            // Pantallas pequeñas (teléfonos)
-            return Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CustomButton(
-                          text: 'Práctica',
-                          color: Colors.yellow,
-                          onTap: () {
-                            Navigator.pushNamed(context, '/cancionesPrecargadas');
-                          },
-                        ),
-                        CustomButton(
-                          text: 'Generar una melodía',
-                          color: Colors.red[200]!,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => GeneratorDisplayScreen()),
-                            );
-                          },
-                        ),
-                        CustomButton(
-                          text: 'Lecciones',
-                          color: Colors.red[200]!,
-                          onTap: () {
-                            Navigator.pushNamed(context, '/lecciones');
-                          },
-                        ),
-                        CustomButton(
-                          text: 'Minijuegos',
-                          color: Colors.blue[200]!,
-                          onTap: () {
-                            // Navigate to Minijuegos Screen
-                          },
-                        ),
-                      ],
                     ),
-                  ),
+                  ],
                 ),
-                Container(
-                  height: constraints.maxHeight * 0.4,
-                  child: IndexedStack(
-                    index: valor,
-                    children: [
-                      Chatbot_Tutorial(
-                        cambiarIndex: (nuevoValor) {
-                          setState(() {
-                            valor = nuevoValor;
-                          });
-                        },
-                      ),
-                      Chatbot(),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }
-        },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -202,18 +152,27 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.all(10),
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          text,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Calcula el tamaño de la fuente en base al ancho disponible
+          double fontSize = constraints.maxWidth * 0.1; // Ajusta este factor según sea necesario
+          
+          return Container(
+            margin: const EdgeInsets.all(5),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+            ),
+          );
+        },
       ),
     );
   }
 }
+

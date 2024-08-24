@@ -1,21 +1,17 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
-/// A stateful widget that represents the Chatbot Leccion1.
 class Chatbot_Leccion1 extends StatefulWidget {
-  int tipo;
+  final int tipo;
 
-  Chatbot_Leccion1({
-    required this.tipo,
-    Key? key,
-  }) : super(key: key);
+  Chatbot_Leccion1({required this.tipo, Key? key}) : super(key: key);
 
   @override
   ChatbotTutorialState createState() => ChatbotTutorialState();
 }
 
-/// The state for the Chatbot Leccion1 widget.
 class ChatbotTutorialState extends State<Chatbot_Leccion1> {
   bool isVisibleChat = false;
   int _indexTalk = 0;
@@ -29,7 +25,6 @@ class ChatbotTutorialState extends State<Chatbot_Leccion1> {
     mostrarGuia(widget.tipo);
   }
 
-  /// Displays the guide based on the given [tipo].
   void mostrarGuia(int tipo) async {
     if (tipo >= 0 && tipo < Guia.length) {
       await _speak(Guia[tipo]);
@@ -38,7 +33,6 @@ class ChatbotTutorialState extends State<Chatbot_Leccion1> {
     }
   }
 
-  /// Speaks the given [text] using FlutterTts.
   Future<void> _speak(String text) async {
     await _flutterTts.setSpeechRate(0.5);
     await _flutterTts.speak(text);
@@ -50,8 +44,7 @@ class ChatbotTutorialState extends State<Chatbot_Leccion1> {
       if (localIndex < text.length) {
         setState(() {
           textoMostrado = text.substring(0, localIndex + 1);
-          _indexTalk =
-              text.substring(localIndex, localIndex + 1) == " " ? 0 : 1;
+          _indexTalk = text.substring(localIndex, localIndex + 1) == " " ? 0 : 1;
         });
         localIndex++;
       } else {
@@ -69,7 +62,6 @@ class ChatbotTutorialState extends State<Chatbot_Leccion1> {
     super.dispose();
   }
 
-  /// Initializes the Text-to-Speech (TTS) engine and sets the voice to Spanish.
   void initTTS() async {
     voices = await _flutterTts.getVoices;
     voices = voices
@@ -81,7 +73,6 @@ class ChatbotTutorialState extends State<Chatbot_Leccion1> {
     }
   }
 
-  /// The guide messages for the Chatbot Leccion1.
   List<String> Guia = [
     '¡Hola! Bienvenido/a a la lección teórica. Aquí verás 6 pictogramas que representan diferentes conceptos. Vamos a explorarlos juntos.',
     'Después de explorar los pictogramas, vamos a hacer una actividad. Deberás clasificar imágenes como Sonoras o Silenciosas. Arrastra cada imagen a la zona correcta.',
@@ -92,17 +83,20 @@ class ChatbotTutorialState extends State<Chatbot_Leccion1> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Align(
+      alignment: Alignment.bottomRight,
       child: Padding(
-        padding: const EdgeInsets.only(left: 10.0),
+        padding: const EdgeInsets.all(10.0),
         child: GestureDetector(
           onTap: isVisibleChat ? null : null,
           child: Container(
             child: IndexedStack(
               index: _indexTalk,
               children: [
-                Image.asset('assets/chatbot_camaleon_color_final.png'),
-                Image.asset('assets/chatbot_camaleon_color_habla_final.png'),
+                Image.asset('assets/chatbot_camaleon_color_final.png', height: 100,
+                        width: 100,),
+                Image.asset('assets/chatbot_camaleon_color_habla_final.png',height: 100,
+                        width: 100,),
               ],
             ),
           ),
